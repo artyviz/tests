@@ -1,0 +1,199 @@
+================================================================================
+  UNIVERSITY ERP — HIGH-PERFORMANCE DATA INGESTION SIMULATOR
+  Run Guide (start → build → end)
+================================================================================
+
+PREREQUISITES
+─────────────
+  - Docker Desktop (running)
+  - Docker Compose v2+
+  - No local services occupying ports 3000, 5432, 5672, 8000, 15672
+
+
+================================================================================
+  STEP 1 — BUILD ALL SERVICES
+================================================================================
+
+  Open a terminal in this directory (university_erp/) and run:
+
+      docker compose build
+
+  This builds three images:
+    • university_erp-rust_api      ← Axum REST + WebSocket API
+    • university_erp-web_app       ← FastAPI / Jinja2 frontend
+    • university_erp-python_worker ← RabbitMQ ETL worker
+
+
+================================================================================
+  STEP 2 — START THE STACK
+================================================================================
+
+  Start all core services (Postgres, RabbitMQ, Rust API, Web App):
+
+      docker compose up -d
+
+  Start the Python ETL worker in addition:
+
+      docker compose --profile etl up -d
+
+  Wait ~10 seconds for Postgres and RabbitMQ health checks to pass.
+
+
+================================================================================
+  STEP 3 — VERIFY EVERYTHING IS RUNNING
+================================================================================
+
+  Check container statuses:
+
+      docker ps
+
+  You should see all of these as "Up":
+    • erp_postgres
+    • erp_rabbitmq
+    • erp_rust_api
+    • erp_web_app
+    • erp_python_worker
+
+  Check Rust API is live:
+
+      curl http://localhost:3000/api/analytics/dashboard
+
+  You should get a JSON response with student/course counts.
+
+
+================================================================================
+  STEP 4 — OPEN THE WEB APP
+================================================================================
+
+  Open your browser and navigate to:
+
+      http://localhost:8000/simulate
+
+  Pages available:
+    • /simulate      — Data Ingestion Simulator (select 10 → 100K entries)
+    • /analysis      — Live System Analysis (CPU, Memory, TCP graphs)
+
+
+================================================================================
+  STEP 5 — RUN A SIMULATION
+================================================================================
+
+  1. On the /simulate page, click any of the batch buttons:
+       10 | 100 | 1K | 10K | 50K | 100K
+
+  2. A job is dispatched:
+       Browser → Flask → Rust API → RabbitMQ → Python Worker → Postgres
+
+  3. Watch in real-time:
+       • Terminal: npm-style cascading logs (batch ID, fake ops, final summary)
+       • Live Analysis Dashboard: Total Students count increments
+       • Live Database View: New student rows prepend to the table every second
+
+  4. Navigate to /analysis to see real-time system metrics updating live.
+
+
+================================================================================
+  STEP 6 — MONITORING & LOGS
+================================================================================
+
+  View live logs per service:
+
+      docker logs -f erp_python_worker    ← ETL batch processing
+      docker logs -f erp_rust_api         ← API requests / WebSocket events
+      docker logs -f erp_web_app          ← Frontend requests
+
+  RabbitMQ management UI (optional):
+
+      http://localhost:15672
+      Username: guest
+      Password: guest
+
+
+================================================================================
+  STEP 7 — STOP EVERYTHING
+================================================================================
+
+  Graceful stop (preserves database volume):
+
+      docker compose down
+
+  Full teardown (DELETES database data too):
+
+      docker compose down -v
+
+
+================================================================================
+  TROUBLESHOOTING
+================================================================================
+
+  Problem: Rust API container exits immediately after starting
+  Fix:     docker compose build --no-cache rust_api
+           docker compose up -d rust_api
+
+  Problem: Terminal in /simulate stays empty after clicking a batch
+  Fix:     Check python_worker is running:
+               docker logs erp_python_worker --tail 20
+           If it's crash-looping, rebuild:
+               docker compose build python_worker
+               docker compose --profile etl up -d python_worker
+
+  Problem: /api/students returns 500 error
+  Fix:     The gpa column must be FLOAT8 (not NUMERIC). Apply manually:
+               docker exec -it erp_postgres psql -U erp_admin -d university_erp
+               ALTER TABLE students ALTER COLUMN gpa TYPE FLOAT8;
+               \q
+
+  Problem: Docker build is very slow (Rust recompiling everything)
+  Fix:     This is normal on first build (~3-5 min). Subsequent builds use
+           the cargo cache layer and are much faster.
+
+  Problem: Port already in use
+  Fix:     Stop conflicting local services, or change the port mappings in
+           docker-compose.yml under the `ports:` section.
+
+
+================================================================================
+  PORT REFERENCE
+================================================================================
+
+  Service                 Host Port   Container Port
+  ──────────────────────  ─────────   ──────────────
+  Web App (Flask)         8000        8000
+  Rust REST API           3000        3000
+  PostgreSQL              5432        5432
+  RabbitMQ (AMQP)         5672        5672
+  RabbitMQ (Management)   15672       15672
+
+
+================================================================================
+  ARCHITECTURE OVERVIEW
+================================================================================
+
+  [Browser]
+      │  HTTP polls every 1s
+      ▼
+  [Flask Web App :8000]
+      │  POST /api/simulate  (count=N)
+      ▼
+  [Rust Axum API :3000]
+      │  Publishes task → generation_queue
+      ▼
+  [RabbitMQ :5672]
+      │  Consumes task
+      ▼
+  [Python ETL Worker]
+      │  Generates random students (Indian/Arabic/US names)
+      │  Bulk inserts via psycopg2 → Postgres
+      │  Publishes metrics → metrics_exchange (fanout)
+      ▼
+  [Rust WebSocket /api/ws]
+      │  Forwards metrics to browser
+      ▼
+  [Browser Terminal]  ← Live npm-style log cascade
+
+  [Browser Analysis]
+      │  GET /api/system_metrics (every 1s)
+      ▼
+  [Flask → psutil]  ← CPU, Memory, TCP connection counts → Chart.js graphs
+
+================================================================================

@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+
+{% block title %}System Analysis{% endblock %}
+
+{% block content %}
+<style>
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        margin-bottom: 2rem;
+    }
+
+    .chart-card {
+        background: #0d1117;
+        border: 1px solid #30363d;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        position: relative;
+    }
+
+    .chart-card h3 {
+        margin: 0 0 16px 0;
+        font-size: 14px;
+        color: #8b949e;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .canvas-container {
+        position: relative;
+        height: 250px;
+        width: 100%;
+    }
+</style>
+
+<div class="content-header" style="margin-bottom: 24px;">
+    <h1>System Analysis Dashboard</h1>
+    <p style="color: #8b949e; margin-top: 8px;">Real-time host metrics polling via Python psutil.</p>
+</div>
+
+<div class="dashboard-grid">
+    <div class="chart-card">
+        <h3>CPU Load (%)</h3>
+        <div class="canvas-container">
+            <canvas id="cpuChart"></canvas>
+        </div>
+    </div>
+
+    <div class="chart-card">
+        <h3>Memory Usage (%)</h3>
+        <div class="canvas-container">
+            <canvas id="memChart"></canvas>
+        </div>
+    </div>
+
+    <div class="chart-card">
+        <h3>Active TCP Connections</h3>
+        <div class="canvas-container">
+            <canvas id="netChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Common Chart Configuration Minimal Theme
+    Chart.defaults.color = '#8b949e';
+    Chart.defaults.font.family = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif';
+
+    const commonOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: {
+            duration: 0 // Disable animation for live feed
+        },
+        scales: {
+            x: {
+                display: false // Hide X axis labels for live scroll effect
+            },
+            y: {
+                beginAtZero: true,
+                max: 100,
+                grid: {
+                    color: '#30363d'
+                }
+            }
+        },
+        plugins: {
+            legend: {
+                display: false
+            }
+        }
+    };
+
+    const numPoints = 20;
+
+    // Initialize Data Arrays
+    const createEmptyArray = () => Array(numPoints).fill(0);
+    const labels = Array(numPoints).fill('');
+
+    const cpuData = createEmptyArray();
+    const memData = createEmptyArray();
+    const netData = createEmptyArray();
+
+    // Init Charts
+    const ctxCpu = document.getElementById('cpuChart').getContext('2d');
+    const cpuChart = new Chart(ctxCpu, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: cpuData,
+                borderColor: '#58a6ff',
+                backgroundColor: 'rgba(88, 166, 255, 0.1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 0
+            }]
+        },
+        options: commonOptions
+    });
+
+    const ctxMem = document.getElementById('memChart').getContext('2d');
+    const memChart = new Chart(ctxMem, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: memData,
+                borderColor: '#8957e5',
+                backgroundColor: 'rgba(137, 87, 229, 0.1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 0
+            }]
+        },
+        options: commonOptions
+    });
+
+    const ctxNet = document.getElementById('netChart').getContext('2d');
+    // Net Chart might exceed 100
+    const netOptions = JSON.parse(JSON.stringify(commonOptions));
+    delete netOptions.scales.y.max;
+
+    const netChart = new Chart(ctxNet, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: netData,
+                borderColor: '#3fb950',
+                backgroundColor: 'rgba(63, 185, 80, 0.1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 0
+            }]
+        },
+        options: netOptions
+    });
+
+    // Update Loop
+    async function fetchSystemMetrics() {
+        try {
+            const resp = await fetch('/api/system_metrics');
+            if (resp.ok) {
+                const data = await resp.json();
+
+                // Shift Arrays
+                cpuData.shift(); cpuData.push(data.cpu_percent);
+                memData.shift(); memData.push(data.memory_percent);
+                netData.shift(); netData.push(data.active_connections);
+
+                cpuChart.update();
+                memChart.update();
+                netChart.update();
+            }
+        } catch (e) {
+            console.error('Failed to fetch system metrics:', e);
+        }
+    }
+
+    // Poll every 1 second
+    setInterval(fetchSystemMetrics, 1000);
+</script>
+{% endblock %}

@@ -1,0 +1,274 @@
+================================================================================
+  UNIVERSITY ERP — RUNNING WITHOUT DOCKER (Native / Local Dev)
+================================================================================
+
+This guide walks you through running every service directly on your machine
+without Docker. You will need to install each dependency manually.
+
+
+================================================================================
+  PREREQUISITES — INSTALL THESE FIRST
+================================================================================
+
+  1. PostgreSQL 15+
+       https://www.postgresql.org/download/
+       After install, ensure `psql` is on your PATH.
+
+  2. RabbitMQ 3.12+
+       https://www.rabbitmq.com/download.html
+       Requires Erlang/OTP to be installed first.
+       https://www.erlang.org/downloads
+
+  3. Rust (stable toolchain)
+       https://rustup.rs/
+       Run:  rustup install stable
+
+  4. Python 3.11+
+       https://www.python.org/downloads/
+
+  5. pip dependencies (for both the ETL worker and web app):
+       pip is bundled with Python 3.11+.
+
+
+================================================================================
+  STEP 1 — SET UP POSTGRESQL
+================================================================================
+
+  1a. Start the PostgreSQL server:
+        (Windows)  net start postgresql-x64-16
+        (macOS)    brew services start postgresql@16
+        (Linux)    sudo systemctl start postgresql
+
+  1b. Create the database and user:
+
+        psql -U postgres
+
+        Then inside psql:
+
+        CREATE USER erp_admin WITH PASSWORD 'erp_secret_2026';
+        CREATE DATABASE university_erp OWNER erp_admin;
+        GRANT ALL PRIVILEGES ON DATABASE university_erp TO erp_admin;
+        \q
+
+  1c. Run the schema initialisation and seed scripts:
+
+        psql -U erp_admin -d university_erp -f database/init.sql
+        psql -U erp_admin -d university_erp -f database/seed.sql
+
+  1d. Apply the FLOAT8 column fix (required for Rust compatibility):
+
+        psql -U erp_admin -d university_erp -c \
+          "ALTER TABLE students ALTER COLUMN gpa TYPE FLOAT8;"
+
+
+================================================================================
+  STEP 2 — SET UP RABBITMQ
+================================================================================
+
+  2a. Start RabbitMQ:
+        (Windows)  rabbitmq-server.bat (from C:\Program Files\RabbitMQ Server\...)
+        (macOS)    brew services start rabbitmq
+        (Linux)    sudo systemctl start rabbitmq-server
+
+  2b. Enable management plugin (optional, for the UI at http://localhost:15672):
+
+        rabbitmq-plugins enable rabbitmq_management
+
+  2c. Verify it is running:
+
+        rabbitmqctl status
+
+  Default credentials: guest / guest
+  The Rust API and Python worker use: amqp://guest:guest@localhost:5672/%2f
+
+
+================================================================================
+  STEP 3 — RUN THE RUST API
+================================================================================
+
+  3a. Open a new terminal and navigate into the rust_api folder:
+
+        cd rust_api
+
+  3b. Create a .env file (already exists, verify contents):
+
+        DATABASE_URL=postgres://erp_admin:erp_secret_2026@localhost:5432/university_erp
+        RUST_LOG=university_erp_api=debug,tower_http=debug
+        API_HOST=0.0.0.0
+        API_PORT=3000
+
+      Also set the RabbitMQ URL as an environment variable:
+        (Windows PowerShell)
+          $env:RABBITMQ_URL = "amqp://guest:guest@localhost:5672/%2f"
+
+        (macOS / Linux)
+          export RABBITMQ_URL="amqp://guest:guest@localhost:5672/%2f"
+
+  3c. Build and run:
+
+        cargo run --release
+
+      First build takes 3–5 minutes (compiling dependencies).
+      On success you will see:
+        INFO  Connected to database
+        INFO  Connected to RabbitMQ
+        INFO  Rust API listening on 0.0.0.0:3000
+
+  API is now available at: http://localhost:3000
+
+
+================================================================================
+  STEP 4 — RUN THE PYTHON ETL WORKER
+================================================================================
+
+  4a. Open a new terminal and navigate to the project root:
+
+        cd university_erp
+
+  4b. Create and activate a virtual environment (recommended):
+
+        python -m venv .venv
+
+        (Windows)  .venv\Scripts\activate
+        (macOS)    source .venv/bin/activate
+
+  4c. Install dependencies:
+
+        pip install -r requirements.txt
+
+      requirements.txt includes: pika, psycopg2-binary, pyyaml, etc.
+
+  4d. Set required environment variables:
+
+        (Windows PowerShell)
+          $env:DB_PASSWORD  = "erp_secret_2026"
+          $env:DB_HOST      = "localhost"
+          $env:RABBITMQ_URL = "amqp://guest:guest@localhost:5672/%2f"
+
+        (macOS / Linux)
+          export DB_PASSWORD=erp_secret_2026
+          export DB_HOST=localhost
+          export RABBITMQ_URL="amqp://guest:guest@localhost:5672/%2f"
+
+  4e. Run the worker:
+
+        python main.py
+
+      On success you will see:
+        INFO  Connecting to RabbitMQ at amqp://...
+        INFO  Worker ready — waiting for tasks on 'generation_queue'
+
+
+================================================================================
+  STEP 5 — RUN THE WEB APP (FRONTEND)
+================================================================================
+
+  5a. Open a new terminal and navigate to the web_app folder:
+
+        cd web_app
+
+  5b. Create and activate a virtual environment (recommended):
+
+        python -m venv .venv
+
+        (Windows)  .venv\Scripts\activate
+        (macOS)    source .venv/bin/activate
+
+  5c. Install dependencies:
+
+        pip install -r requirements.txt
+
+      Packages: fastapi, uvicorn, httpx, jinja2, python-multipart, psutil
+
+  5d. Set the Rust API URL:
+
+        (Windows PowerShell)
+          $env:RUST_API_URL = "http://localhost:3000"
+
+        (macOS / Linux)
+          export RUST_API_URL="http://localhost:3000"
+
+  5e. Run the web server:
+
+        uvicorn app:app --host 0.0.0.0 --port 8000 --reload
+
+      The --reload flag auto-reloads on file changes (great for development).
+
+  Web App is now available at: http://localhost:8000
+
+
+================================================================================
+  STEP 6 — OPEN THE SIMULATOR
+================================================================================
+
+  With all 4 processes running simultaneously, open your browser:
+
+      http://localhost:8000/simulate     ← Terminal Simulator
+      http://localhost:8000/analysis     ← System Analysis Dashboard
+
+
+================================================================================
+  RUNNING ORDER SUMMARY (4 terminals in parallel)
+================================================================================
+
+  Terminal 1 (Postgres):  already running as a system service
+
+  Terminal 2 (RabbitMQ):  already running as a system service
+
+  Terminal 3 (Rust API):
+    cd rust_api
+    cargo run --release
+
+  Terminal 4 (Python Worker):
+    cd university_erp
+    source .venv/bin/activate     (or .venv\Scripts\activate on Windows)
+    python main.py
+
+  Terminal 5 (Web App):
+    cd web_app
+    source .venv/bin/activate     (or .venv\Scripts\activate on Windows)
+    uvicorn app:app --host 0.0.0.0 --port 8000 --reload
+
+
+================================================================================
+  TROUBLESHOOTING — WITHOUT DOCKER
+================================================================================
+
+  Error: "could not connect to server" (Rust API or Python Worker)
+  → PostgreSQL is not running. Start it first (see Step 1a).
+
+  Error: "connection refused on port 5672" (RabbitMQ)
+  → RabbitMQ is not running. Start it first (see Step 2a).
+
+  Error: "sqlx::Error ColumnDecode — gpa"
+  → Run the ALTER TABLE command from Step 1d.
+
+  Error: "duplicate key value violates unique constraint students_email_key"
+  → This is now handled automatically with ON CONFLICT DO NOTHING.
+    If using an older version, upgrade python_core/repository/student_repo.py.
+
+  Error: "cargo: command not found"
+  → Rust is not installed. Run: curl https://sh.rustup.rs -sSf | sh
+
+  Error: "ModuleNotFoundError: No module named 'pika'"
+  → Virtual environment is not activated, or pip install was not run.
+
+  Error: "address already in use :3000"
+  → Another process is using port 3000:
+      (Windows)  netstat -aon | findstr :3000 → taskkill /PID <id> /F
+      (macOS)    lsof -i :3000 | grep LISTEN → kill -9 <PID>
+
+
+================================================================================
+  PORT REFERENCE
+================================================================================
+
+  Service               Port
+  ────────────────────  ─────
+  Web App (FastAPI)     8000
+  Rust Axum API         3000
+  PostgreSQL            5432
+  RabbitMQ (AMQP)       5672
+  RabbitMQ (UI)         15672
+
+================================================================================

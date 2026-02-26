@@ -1,0 +1,10 @@
+__pycache__
+*.pyc
+.pytest_cache
+logs/
+*.log
+.git
+.gitignore
+test_output.txt
+elixir_api_gateway/
+frontend/

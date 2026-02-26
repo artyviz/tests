@@ -1,0 +1,12 @@
+/app/target/debug/deps/amq_protocol-7ed0c485f555aa94.d: /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/amq-protocol-7.2.3/src/lib.rs /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/amq-protocol-7.2.3/src/auth.rs /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/amq-protocol-7.2.3/src/frame/mod.rs /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/amq-protocol-7.2.3/src/frame/structs.rs /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/amq-protocol-7.2.3/src/frame/generation.rs /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/amq-protocol-7.2.3/src/frame/parsing.rs /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/amq-protocol-7.2.3/src/protocol.rs /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/amq-protocol-7.2.3/src/generated.rs
+
+/app/target/debug/deps/libamq_protocol-7ed0c485f555aa94.rmeta: /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/amq-protocol-7.2.3/src/lib.rs /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/amq-protocol-7.2.3/src/auth.rs /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/amq-protocol-7.2.3/src/frame/mod.rs /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/amq-protocol-7.2.3/src/frame/structs.rs /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/amq-protocol-7.2.3/src/frame/generation.rs /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/amq-protocol-7.2.3/src/frame/parsing.rs /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/amq-protocol-7.2.3/src/protocol.rs /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/amq-protocol-7.2.3/src/generated.rs
+
+/usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/amq-protocol-7.2.3/src/lib.rs:
+/usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/amq-protocol-7.2.3/src/auth.rs:
+/usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/amq-protocol-7.2.3/src/frame/mod.rs:
+/usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/amq-protocol-7.2.3/src/frame/structs.rs:
+/usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/amq-protocol-7.2.3/src/frame/generation.rs:
+/usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/amq-protocol-7.2.3/src/frame/parsing.rs:
+/usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/amq-protocol-7.2.3/src/protocol.rs:
+/usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/amq-protocol-7.2.3/src/generated.rs:

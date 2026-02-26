@@ -1,0 +1,681 @@
+    Updating crates.io index
+ Downloading crates ...
+  Downloaded async-trait v0.1.89
+  Downloaded async-reactor-trait v1.1.0
+  Downloaded atomic-waker v1.1.2
+  Downloaded amq-protocol-uri v7.2.3
+  Downloaded cfg-if v1.0.4
+  Downloaded block-buffer v0.10.4
+  Downloaded crc v3.4.0
+  Downloaded axum-core v0.4.5
+  Downloaded atoi v2.0.0
+  Downloaded asn1-rs-derive v0.6.0
+  Downloaded crypto-common v0.1.7
+  Downloaded crossbeam-queue v0.3.12
+  Downloaded crc-catalog v2.4.0
+  Downloaded doc-comment v0.3.4
+  Downloaded futures-core v0.3.32
+  Downloaded event-listener-strategy v0.5.4
+  Downloaded equivalent v1.0.2
+  Downloaded errno v0.3.14
+  Downloaded cpufeatures v0.2.17
+  Downloaded heck v0.4.1
+  Downloaded block-padding v0.3.3
+  Downloaded async-global-executor-trait v2.2.0
+  Downloaded amq-protocol-types v7.2.3
+  Downloaded asn1-rs-impl v0.2.0
+  Downloaded amq-protocol-tcp v7.2.3
+  Downloaded event-listener v2.5.3
+  Downloaded fastrand v1.9.0
+  Downloaded futures-sink v0.3.32
+  Downloaded futures-io v0.3.32
+  Downloaded executor-trait v2.1.2
+  Downloaded form_urlencoded v1.2.2
+  Downloaded futures-task v0.3.32
+  Downloaded generic-array v0.14.7
+  Downloaded flagset v0.4.7
+  Downloaded itoa v1.0.17
+  Downloaded idna_adapter v1.2.1
+  Downloaded headers-core v0.3.0
+  Downloaded lazy_static v1.5.0
+  Downloaded home v0.5.12
+  Downloaded http-body v1.0.1
+  Downloaded hex v0.4.3
+  Downloaded inout v0.1.4
+  Downloaded futures-macro v0.3.32
+  Downloaded sha1 v0.10.6
+  Downloaded httpdate v1.0.3
+  Downloaded async-channel v2.5.0
+  Downloaded cookie-factory v0.3.3
+  Downloaded concurrent-queue v2.5.0
+  Downloaded cbc v0.1.2
+  Downloaded async-lock v2.8.0
+  Downloaded displaydoc v0.2.5
+  Downloaded digest v0.10.7
+  Downloaded deranged v0.5.8
+  Downloaded base64ct v1.8.3
+  Downloaded async-global-executor v3.1.0
+  Downloaded data-encoding v2.10.0
+  Downloaded blocking v1.6.2
+  Downloaded mime v0.3.17
+  Downloaded dotenvy v0.15.7
+  Downloaded pinky-swear v6.2.1
+  Downloaded find-msvc-tools v0.1.9
+  Downloaded der_derive v0.7.3
+  Downloaded futures-executor v0.3.32
+  Downloaded either v1.15.0
+  Downloaded cipher v0.4.4
+  Downloaded pin-utils v0.1.0
+  Downloaded autocfg v1.5.0
+  Downloaded percent-encoding v2.3.2
+  Downloaded async-executor v1.14.0
+  Downloaded amq-protocol v7.2.3
+  Downloaded byteorder v1.5.0
+  Downloaded axum-macros v0.4.2
+  Downloaded signature v2.2.0
+  Downloaded bitflags v1.3.2
+  Downloaded salsa20 v0.10.2
+  Downloaded piper v0.2.4
+  Downloaded http-body-util v0.1.3
+  Downloaded sha2 v0.10.9
+  Downloaded serde_urlencoded v0.7.1
+  Downloaded pbkdf2 v0.12.2
+  Downloaded hashlink v0.8.4
+  Downloaded num-iter v0.1.45
+  Downloaded stable_deref_trait v1.2.1
+  Downloaded sqlx-macros v0.7.4
+  Downloaded potential_utf v0.1.4
+  Downloaded scrypt v0.11.0
+  Downloaded argon2 v0.5.3
+  Downloaded subtle v2.6.1
+  Downloaded sync_wrapper v1.0.2
+  Downloaded fastrand v2.3.0
+  Downloaded openssl-probe v0.1.6
+  Downloaded axum-extra v0.9.6
+  Downloaded crossbeam-utils v0.8.21
+  Downloaded scopeguard v1.2.0
+  Downloaded reactor-trait v1.1.0
+  Downloaded ahash v0.8.12
+  Downloaded rustls-connector v0.20.2
+  Downloaded blake2 v0.10.6
+  Downloaded event-listener v5.4.1
+  Downloaded powerfmt v0.2.0
+  Downloaded async-io v1.13.0
+  Downloaded rand_chacha v0.3.1
+  Downloaded futures-lite v1.13.0
+  Downloaded des v0.8.1
+  Downloaded md-5 v0.10.6
+  Downloaded futures-channel v0.3.32
+  Downloaded rc2 v0.8.1
+  Downloaded serde_path_to_error v0.1.20
+  Downloaded parking v2.2.1
+  Downloaded tcp-stream v0.28.0
+  Downloaded signal-hook-registry v1.4.8
+  Downloaded slab v0.4.12
+  Downloaded shlex v1.3.0
+  Downloaded async-lock v3.4.2
+  Downloaded time-core v0.1.8
+  Downloaded matchers v0.2.0
+  Downloaded tinyvec_macros v0.1.1
+  Downloaded multer v3.1.0
+  Downloaded matchit v0.7.3
+  Downloaded iana-time-zone v0.1.65
+  Downloaded tower-layer v0.3.3
+  Downloaded httparse v1.10.1
+  Downloaded spki v0.7.3
+  Downloaded sqlformat v0.2.6
+  Downloaded sqlx-macros-core v0.7.4
+  Downloaded stringprep v0.1.5
+  Downloaded utf-8 v0.7.6
+  Downloaded untrusted v0.9.0
+  Downloaded version_check v0.9.5
+  Downloaded synstructure v0.13.2
+  Downloaded zerofrom v0.1.6
+  Downloaded tower-service v0.3.3
+  Downloaded zerofrom-derive v0.1.6
+  Downloaded yoke-derive v0.8.1
+  Downloaded num-conv v0.2.0
+  Downloaded pem-rfc7468 v0.7.0
+  Downloaded pin-project-lite v0.2.16
+  Downloaded rand_chacha v0.9.0
+  Downloaded oid-registry v0.8.1
+  Downloaded async-task v4.7.1
+  Downloaded thiserror-impl v1.0.69
+  Downloaded allocator-api2 v0.2.21
+  Downloaded rand_core v0.6.4
+  Downloaded paste v1.0.15
+  Downloaded async-io v2.6.0
+  Downloaded num-integer v0.1.46
+  Downloaded bitflags v2.11.0
+  Downloaded password-hash v0.5.0
+  Downloaded rusticata-macros v4.1.0
+  Downloaded pkcs8 v0.10.2
+  Downloaded rustls-native-certs v0.7.3
+  Downloaded getrandom v0.4.1
+  Downloaded rustversion v1.0.22
+  Downloaded rand_core v0.9.5
+  Downloaded ppv-lite86 v0.2.21
+  Downloaded pkg-config v0.3.32
+  Downloaded getrandom v0.3.4
+  Downloaded getrandom v0.2.17
+  Downloaded pin-project-internal v1.1.10
+  Downloaded thiserror v2.0.18
+  Downloaded urlencoding v2.1.3
+  Downloaded thiserror-impl v2.0.18
+  Downloaded utf8_iter v1.0.4
+  Downloaded rustls-pemfile v2.2.0
+  Downloaded quote v1.0.44
+  Downloaded thiserror v1.0.69
+  Downloaded tokio-macros v2.6.0
+  Downloaded tinystr v0.8.2
+  Downloaded time-macros v0.2.27
+  Downloaded waker-fn v1.2.0
+  Downloaded tokio-tungstenite v0.24.0
+  Downloaded io-lifetimes v1.0.11
+  Downloaded simple_asn1 v0.6.4
+  Downloaded pem v3.0.6
+  Downloaded futures-lite v2.6.1
+  Downloaded litemap v0.8.1
+  Downloaded hmac v0.12.1
+  Downloaded lock_api v0.4.14
+  Downloaded spin v0.9.8
+  Downloaded tracing-log v0.2.0
+  Downloaded zerovec-derive v0.11.2
+  Downloaded parking_lot_core v0.9.12
+  Downloaded once_cell v1.21.3
+  Downloaded base64 v0.22.1
+  Downloaded bytes v1.11.1
+  Downloaded pkcs1 v0.7.5
+  Downloaded aes v0.8.4
+  Downloaded parking_lot v0.12.5
+  Downloaded rustls-pki-types v1.14.0
+  Downloaded flume v0.11.1
+  Downloaded const-oid v0.9.6
+  Downloaded serde_derive v1.0.228
+  Downloaded sharded-slab v0.1.7
+  Downloaded p12-keystore v0.1.5
+  Downloaded thread_local v1.1.9
+  Downloaded nu-ansi-term v0.50.3
+  Downloaded polling v2.8.0
+  Downloaded writeable v0.6.2
+  Downloaded yoke v0.8.1
+  Downloaded whoami v1.6.1
+  Downloaded zeroize v1.8.2
+  Downloaded smallvec v1.15.1
+  Downloaded headers v0.4.1
+  Downloaded tempfile v3.26.0
+  Downloaded socket2 v0.4.10
+  Downloaded socket2 v0.6.2
+  Downloaded sqlx-mysql v0.7.4
+  Downloaded sqlx-sqlite v0.7.4
+  Downloaded log v0.4.29
+  Downloaded icu_properties v2.1.2
+  Downloaded tracing-attributes v0.1.31
+  Downloaded jsonwebtoken v9.3.1
+  Downloaded icu_normalizer_data v2.1.1
+  Downloaded icu_locale_core v2.1.1
+  Downloaded base64 v0.21.7
+  Downloaded der-parser v10.0.0
+  Downloaded cc v1.2.56
+  Downloaded futures-intrusive v0.5.0
+  Downloaded icu_provider v2.1.1
+  Downloaded serde_core v1.0.228
+  Downloaded num-traits v0.2.19
+  Downloaded tokio-stream v0.1.18
+  Downloaded tinyvec v1.10.0
+  Downloaded proc-macro2 v1.0.106
+  Downloaded pkcs5 v0.7.1
+  Downloaded zmij v1.0.21
+  Downloaded pin-project v1.1.10
+  Downloaded tungstenite v0.24.0
+  Downloaded unicode-ident v1.0.24
+  Downloaded asn1-rs v0.7.1
+  Downloaded unicode-bidi v0.3.18
+  Downloaded icu_normalizer v2.1.1
+  Downloaded serde v1.0.228
+  Downloaded uuid v1.21.0
+  Downloaded tracing-core v0.1.36
+  Downloaded unicode-properties v0.1.4
+  Downloaded icu_collections v2.1.1
+  Downloaded polling v3.11.0
+  Downloaded typenum v1.19.0
+  Downloaded pkcs12 v0.1.0
+  Downloaded der v0.7.10
+  Downloaded minimal-lexical v0.2.1
+  Downloaded zerotrie v0.2.3
+  Downloaded ryu v1.0.23
+  Downloaded rsa v0.9.10
+  Downloaded rand v0.8.5
+  Downloaded rustls-webpki v0.103.9
+  Downloaded http v1.4.0
+  Downloaded unicode_categories v0.1.1
+  Downloaded url v2.5.8
+  Downloaded indexmap v2.13.0
+  Downloaded memchr v2.8.0
+  Downloaded hyper-util v0.1.20
+  Downloaded x509-parser v0.17.0
+  Downloaded rand v0.9.2
+  Downloaded sqlx-core v0.7.4
+  Downloaded unicode-segmentation v1.12.0
+  Downloaded x509-cert v0.2.5
+  Downloaded num-bigint v0.4.6
+  Downloaded nom v7.1.3
+  Downloaded mio v1.1.1
+  Downloaded sqlx-postgres v0.7.4
+  Downloaded hashbrown v0.14.5
+  Downloaded num-bigint-dig v0.8.6
+  Downloaded tower-http v0.5.2
+  Downloaded tower v0.4.13
+  Downloaded zerovec v0.11.5
+  Downloaded unicode-normalization v0.1.25
+  Downloaded lapin v2.5.5
+  Downloaded libm v0.2.16
+  Downloaded idna v1.1.0
+  Downloaded tokio-util v0.7.18
+  Downloaded icu_properties_data v2.1.2
+  Downloaded hashbrown v0.16.1
+  Downloaded tower v0.5.3
+  Downloaded hkdf v0.12.4
+  Downloaded futures-util v0.3.32
+  Downloaded sqlx v0.7.4
+  Downloaded serde_json v1.0.149
+  Downloaded axum v0.7.9
+  Downloaded cms v0.2.3
+  Downloaded aho-corasick v1.1.4
+  Downloaded hyper v1.8.1
+  Downloaded chrono v0.4.44
+  Downloaded time v0.3.47
+  Downloaded syn v1.0.109
+  Downloaded tracing-subscriber v0.3.22
+  Downloaded vcpkg v0.2.15
+  Downloaded zerocopy v0.8.39
+  Downloaded syn v2.0.117
+  Downloaded regex-syntax v0.8.10
+  Downloaded rustix v0.37.28
+  Downloaded rustls v0.23.37
+  Downloaded rustix v1.1.4
+  Downloaded regex-automata v0.4.14
+  Downloaded tracing v0.1.44
+  Downloaded libc v0.2.182
+  Downloaded tokio v1.49.0
+  Downloaded linux-raw-sys v0.3.8
+  Downloaded encoding_rs v0.8.35
+  Downloaded ring v0.17.14
+  Downloaded linux-raw-sys v0.12.1
+  Downloaded libsqlite3-sys v0.27.0
+    Checking cfg-if v1.0.4
+    Checking pin-project-lite v0.2.16
+    Checking itoa v1.0.17
+    Checking futures-core v0.3.32
+   Compiling libc v0.2.182
+   Compiling zerocopy v0.8.39
+    Checking memchr v2.8.0
+    Checking subtle v2.6.1
+   Compiling generic-array v0.14.7
+    Checking typenum v1.19.0
+   Compiling serde_core v1.0.228
+    Checking smallvec v1.15.1
+   Compiling parking_lot_core v0.9.12
+    Checking futures-io v0.3.32
+    Checking log v0.4.29
+    Checking once_cell v1.21.3
+    Checking bytes v1.11.1
+   Compiling icu_properties_data v2.1.2
+   Compiling serde v1.0.228
+    Checking scopeguard v1.2.0
+    Checking zerofrom v0.1.6
+    Checking stable_deref_trait v1.2.1
+    Checking lock_api v0.4.14
+   Compiling zmij v1.0.21
+    Checking cpufeatures v0.2.17
+    Checking num-traits v0.2.19
+    Checking futures-sink v0.3.32
+    Checking yoke v0.8.1
+    Checking slab v0.4.12
+   Compiling serde_json v1.0.149
+    Checking crossbeam-utils v0.8.21
+    Checking minimal-lexical v0.2.1
+    Checking zeroize v1.8.2
+    Checking tracing-core v0.1.36
+    Checking nom v7.1.3
+    Checking zerovec v0.11.5
+    Checking getrandom v0.2.17
+   Compiling getrandom v0.3.4
+    Checking errno v0.3.14
+    Checking tracing v0.1.44
+    Checking crypto-common v0.1.7
+    Checking block-buffer v0.10.4
+    Checking parking_lot v0.12.5
+    Checking block-padding v0.3.3
+    Checking base64ct v1.8.3
+    Checking litemap v0.8.1
+    Checking writeable v0.6.2
+    Checking parking v2.2.1
+    Checking digest v0.10.7
+    Checking inout v0.1.4
+    Checking tinystr v0.8.2
+    Checking potential_utf v0.1.4
+   Compiling thiserror v1.0.69
+    Checking signal-hook-registry v1.4.8
+    Checking mio v1.1.1
+    Checking socket2 v0.6.2
+    Checking zerotrie v0.2.3
+    Checking http v1.4.0
+   Compiling time-core v0.1.8
+    Checking powerfmt v0.2.0
+   Compiling num-conv v0.2.0
+    Checking icu_collections v2.1.1
+    Checking cipher v0.4.4
+    Checking tokio v1.49.0
+    Checking icu_locale_core v2.1.1
+    Checking deranged v0.5.8
+   Compiling time-macros v0.2.27
+    Checking concurrent-queue v2.5.0
+    Checking percent-encoding v2.3.2
+    Checking thiserror v2.0.18
+    Checking icu_provider v2.1.1
+    Checking form_urlencoded v1.2.2
+    Checking hmac v0.12.1
+    Checking ppv-lite86 v0.2.21
+    Checking pem-rfc7468 v0.7.0
+    Checking icu_normalizer_data v2.1.1
+    Checking const-oid v0.9.6
+    Checking futures-task v0.3.32
+    Checking flagset v0.4.7
+    Checking futures-util v0.3.32
+    Checking sha1 v0.10.6
+    Checking icu_properties v2.1.2
+    Checking icu_normalizer v2.1.1
+    Checking sha2 v0.10.9
+    Checking rand_core v0.6.4
+    Checking der v0.7.10
+    Checking time v0.3.47
+    Checking num-integer v0.1.46
+    Checking data-encoding v2.10.0
+    Checking rusticata-macros v4.1.0
+    Checking rustls-pki-types v1.14.0
+    Checking num-bigint v0.4.6
+    Checking untrusted v0.9.0
+    Checking bitflags v2.11.0
+    Checking atomic-waker v1.1.2
+    Checking utf8_iter v1.0.4
+    Checking fastrand v2.3.0
+    Checking ring v0.17.14
+    Checking idna_adapter v1.2.1
+    Checking spki v0.7.3
+    Checking asn1-rs v0.7.1
+    Checking hex v0.4.3
+    Checking lazy_static v1.5.0
+    Checking x509-cert v0.2.5
+   Compiling oid-registry v0.8.1
+    Checking httparse v1.10.1
+    Checking rand_chacha v0.3.1
+   Compiling ahash v0.8.12
+    Checking idna v1.1.0
+    Checking pbkdf2 v0.12.2
+    Checking salsa20 v0.10.2
+    Checking http-body v1.0.1
+    Checking event-listener v5.4.1
+    Checking rand_core v0.9.5
+    Checking url v2.5.8
+    Checking futures-channel v0.3.32
+   Compiling allocator-api2 v0.2.21
+    Checking event-listener v2.5.3
+    Checking tower-service v0.3.3
+    Checking byteorder v1.5.0
+   Compiling tinyvec_macros v0.1.1
+   Compiling hashbrown v0.14.5
+   Compiling rustix v1.1.4
+    Checking der-parser v10.0.0
+   Compiling tinyvec v1.10.0
+    Checking cms v0.2.3
+    Checking rand_chacha v0.9.0
+    Checking event-listener-strategy v0.5.4
+    Checking scrypt v0.11.0
+    Checking rand v0.8.5
+    Checking rustls-webpki v0.103.9
+    Checking futures-lite v2.6.1
+    Checking rustls-pemfile v2.2.0
+    Checking aes v0.8.4
+    Checking cbc v0.1.2
+    Checking tower-layer v0.3.3
+    Checking linux-raw-sys v0.12.1
+   Compiling unicode_categories v0.1.1
+   Compiling equivalent v1.0.2
+   Compiling iana-time-zone v0.1.65
+   Compiling crc-catalog v2.4.0
+   Compiling hashbrown v0.16.1
+    Checking openssl-probe v0.1.6
+   Compiling sqlformat v0.2.6
+    Checking pkcs5 v0.7.1
+    Checking rustls-native-certs v0.7.3
+   Compiling crc v3.4.0
+   Compiling chrono v0.4.44
+   Compiling crossbeam-queue v0.3.12
+   Compiling indexmap v2.13.0
+    Checking rustls v0.23.37
+    Checking pkcs12 v0.1.0
+    Checking x509-parser v0.17.0
+   Compiling either v1.15.0
+    Checking rand v0.9.2
+   Compiling futures-intrusive v0.5.0
+   Compiling tokio-stream v0.1.18
+   Compiling hashlink v0.8.4
+   Compiling unicode-normalization v0.1.25
+   Compiling atoi v2.0.0
+    Checking des v0.8.1
+    Checking rc2 v0.8.1
+    Checking spin v0.9.8
+    Checking mime v0.3.17
+    Checking async-task v4.7.1
+    Checking httpdate v1.0.3
+   Compiling unicode-properties v0.1.4
+    Checking base64 v0.22.1
+   Compiling unicode-bidi v0.3.18
+    Checking cookie-factory v0.3.3
+    Checking rustls-connector v0.20.2
+   Compiling hkdf v0.12.4
+    Checking polling v3.11.0
+   Compiling sqlx-core v0.7.4
+    Checking amq-protocol-types v7.2.3
+   Compiling stringprep v0.1.5
+    Checking io-lifetimes v1.0.11
+    Checking p12-keystore v0.1.5
+    Checking async-channel v2.5.0
+    Checking http-body-util v0.1.3
+    Checking piper v0.2.4
+   Compiling md-5 v0.10.6
+   Compiling getrandom v0.4.1
+   Compiling base64 v0.21.7
+    Checking pin-utils v0.1.0
+    Checking bitflags v1.3.2
+    Checking linux-raw-sys v0.3.8
+    Checking waker-fn v1.2.0
+    Checking sync_wrapper v1.0.2
+    Checking utf-8 v0.7.6
+    Checking fastrand v1.9.0
+   Compiling whoami v1.6.1
+   Compiling dotenvy v0.15.7
+   Compiling home v0.5.12
+    Checking amq-protocol-uri v7.2.3
+    Checking futures-lite v1.13.0
+    Checking rustix v0.37.28
+   Compiling tempfile v3.26.0
+    Checking tungstenite v0.24.0
+    Checking uuid v1.21.0
+    Checking hyper v1.8.1
+   Compiling doc-comment v0.3.4
+   Compiling async-io v1.13.0
+    Checking async-io v2.6.0
+    Checking blocking v1.6.2
+    Checking polling v2.8.0
+    Checking async-executor v1.14.0
+    Checking async-lock v3.4.2
+    Checking async-lock v2.8.0
+    Checking socket2 v0.4.10
+    Checking ryu v1.0.23
+    Checking regex-syntax v0.8.10
+    Checking serde_urlencoded v0.7.1
+    Checking tcp-stream v0.28.0
+    Checking hyper-util v0.1.20
+   Compiling multer v3.1.0
+    Checking tokio-tungstenite v0.24.0
+    Checking axum-core v0.4.5
+    Checking async-global-executor v3.1.0
+    Checking tower v0.5.3
+    Checking flume v0.11.1
+    Checking reactor-trait v1.1.0
+    Checking regex-automata v0.4.14
+    Checking executor-trait v2.1.2
+    Checking headers-core v0.3.0
+    Checking serde_path_to_error v0.1.20
+    Checking encoding_rs v0.8.35
+    Checking matchit v0.7.3
+   Compiling lapin v2.5.5
+    Checking pin-project v1.1.10
+    Checking async-reactor-trait v1.1.0
+    Checking async-global-executor-trait v2.2.0
+    Checking headers v0.4.1
+    Checking pinky-swear v6.2.1
+    Checking pem v3.0.6
+    Checking sharded-slab v0.1.7
+    Checking tokio-util v0.7.18
+    Checking simple_asn1 v0.6.4
+    Checking password-hash v0.5.0
+    Checking matchers v0.2.0
+    Checking blake2 v0.10.6
+    Checking tracing-log v0.2.0
+    Checking thread_local v1.1.9
+    Checking nu-ansi-term v0.50.3
+    Checking argon2 v0.5.3
+    Checking tower-http v0.5.2
+    Checking tracing-subscriber v0.3.22
+    Checking axum v0.7.9
+    Checking amq-protocol-tcp v7.2.3
+    Checking jsonwebtoken v9.3.1
+    Checking tower v0.4.13
+   Compiling sqlx-postgres v0.7.4
+    Checking amq-protocol v7.2.3
+    Checking axum-extra v0.9.6
+   Compiling sqlx-macros-core v0.7.4
+   Compiling sqlx-macros v0.7.4
+    Checking sqlx v0.7.4
+    Checking university-erp-api v0.1.0 (/app)
+warning: unused imports: `delete` and `put`
+ --> src/handlers/students.rs:3:26
+  |
+3 |     routing::{get, post, put, delete},
+  |                          ^^^  ^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `delete`
+ --> src/handlers/courses.rs:3:20
+  |
+3 |     routing::{get, delete},
+  |                    ^^^^^^
+
+error[E0599]: no method named `split` found for struct `WebSocket` in the current scope
+    --> src/handlers/ws.rs:24:34
+     |
+  24 |     let (mut sender, _) = socket.split();
+     |                                  ^^^^^ method not found in `WebSocket`
+     |
+    ::: /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/futures-util-0.3.32/src/stream/stream/mod.rs:1582:8
+     |
+1582 |     fn split<Item>(self) -> (SplitSink<Self, Item>, SplitStream<Self>)
+     |        ----- the method is available for `WebSocket` here
+     |
+     = help: items from traits can only be used if the trait is in scope
+help: trait `StreamExt` which provides `split` is implemented but not in scope; perhaps you want to import it
+     |
+   1 + use futures_util::StreamExt;
+     |
+
+error[E0282]: type annotations needed
+  --> src/handlers/ws.rs:28:12
+   |
+28 |         if sender.send(Message::Text(msg)).await.is_err() {
+   |            ^^^^^^ cannot infer type
+
+error[E0282]: type annotations needed
+  --> src/handlers/ws.rs:28:12
+   |
+28 |         if sender.send(Message::Text(msg)).await.is_err() {
+   |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ cannot infer type
+
+error[E0277]: the trait bound `fn(Extension<...>, ...) -> ... {start_simulation}: Handler<_, _>` is not satisfied
+    --> src/handlers/mod.rs:23:34
+     |
+  23 |         .route("/simulate", post(simulate::start_simulation))
+     |                             ---- ^^^^^^^^^^^^^^^^^^^^^^^^^^ the trait `Handler<_, _>` is not implemented for fn item `fn(Extension<Connection>, Json<...>) -> ... {start_simulation}`
+     |                             |
+     |                             required by a bound introduced by this call
+     |
+     = note: Consider using `#[axum::debug_handler]` to improve the error message
+help: the following other types implement trait `Handler<T, S>`
+    --> /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/axum-0.7.9/src/routing/method_routing.rs:1309:1
+     |
+1309 | / impl<S> Handler<(), S> for MethodRouter<S>
+1310 | | where
+1311 | |     S: Clone + 'static,
+     | |_______________________^ `MethodRouter<S>` implements `Handler<(), S>`
+     |
+    ::: /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/axum-0.7.9/src/handler/mod.rs:303:1
+     |
+ 303 | / impl<H, S, T, L> Handler<T, S> for Layered<L, H, T, S>
+ 304 | | where
+ 305 | |     L: Layer<HandlerService<H, T, S>> + Clone + Send + 'static,
+ 306 | |     H: Handler<T, S>,
+...    |
+ 310 | |     T: 'static,
+ 311 | |     S: 'static,
+     | |_______________^ `axum::handler::Layered<L, H, T, S>` implements `Handler<T, S>`
+note: required by a bound in `post`
+    --> /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/axum-0.7.9/src/routing/method_routing.rs:443:1
+     |
+ 443 | top_level_handler_fn!(post, POST);
+     | ^^^^^^^^^^^^^^^^^^^^^^----^^^^^^^
+     | |                     |
+     | |                     required by a bound in this function
+     | required by this bound in `post`
+     = note: the full name for the type has been written to '/app/target/debug/deps/university_erp_api-1fbb58126a6157e4.long-type-2623049889479499302.txt'
+     = note: consider using `--verbose` to print the full type name to the console
+     = note: this error originates in the macro `top_level_handler_fn` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0277]: the trait bound `RateLimit<Route>: Clone` is not satisfied
+   --> src/main.rs:105:16
+    |
+105 |         .layer(RateLimitLayer::new(100, Duration::from_secs(1)))
+    |          ----- ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ the trait `Clone` is not implemented for `RateLimit<Route>`
+    |          |
+    |          required by a bound introduced by this call
+    |
+note: required by a bound in `Router::<S>::layer`
+   --> /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/axum-0.7.9/src/routing/mod.rs:284:40
+    |
+281 |     pub fn layer<L>(self, layer: L) -> Router<S>
+    |            ----- required by a bound in this associated function
+...
+284 |         L::Service: Service<Request> + Clone + Send + 'static,
+    |                                        ^^^^^ required by this bound in `Router::<S>::layer`
+
+error[E0277]: the trait bound `lapin::Connection: Clone` is not satisfied
+   --> src/main.rs:106:10
+    |
+106 |         .layer(axum::Extension(amqp_conn))
+    |          ^^^^^ the trait `Clone` is not implemented for `lapin::Connection`
+    |
+help: the trait `tower::Layer<S>` is implemented for `Extension<T>`
+   --> /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/axum-0.7.9/src/extension.rs:121:1
+    |
+121 | / impl<S, T> tower_layer::Layer<S> for Extension<T>
+122 | | where
+123 | |     T: Clone + Send + Sync + 'static,
+    | |_____________________________________^
+    = note: required for `Extension<lapin::Connection>` to implement `tower::Layer<Route>`
+
+Some errors have detailed explanations: E0277, E0282, E0599.
+For more information about an error, try `rustc --explain E0277`.
+warning: `university-erp-api` (bin "university-erp-api") generated 2 warnings
+error: could not compile `university-erp-api` (bin "university-erp-api") due to 6 previous errors; 2 warnings emitted

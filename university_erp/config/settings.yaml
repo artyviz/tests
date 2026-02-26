@@ -1,0 +1,52 @@
+# ============================================================
+# University ERP — Master Configuration
+# ============================================================
+
+environment: development
+
+# ── Database ──────────────────────────────────────────────────
+database:
+  host: ${DB_HOST:-localhost}
+  port: 5432
+  name: university_erp
+  user: erp_admin
+  password: "${DB_PASSWORD}"          # resolved from env var at runtime
+  pool_size: 20
+  max_overflow: 10
+  timeout: 30
+
+# ── Message Queue (RabbitMQ) ──────────────────────────────────
+message_queue:
+  host: ${MQ_HOST:-localhost}
+  port: 5672
+  user: guest
+  password: guest
+  exchange: university_erp
+  queues:
+    etl_tasks: etl_task_queue
+    write_ops: write_operations_queue
+
+# ── Elixir API Gateway ───────────────────────────────────────
+api_gateway:
+  host: 0.0.0.0
+  port: 4000
+  secret_key_base: "${SECRET_KEY_BASE}"
+  rate_limit:
+    window_ms: 60000
+    max_requests: 1000
+
+# ── ETL Pipeline Module Registry ─────────────────────────────
+# Hot-swappable: change class paths here without touching code.
+etl:
+  extractor: python_core.etl.extractor.CSVExtractor
+  transformer: python_core.etl.transformer.StudentDataTransformer
+  validator: python_core.etl.validator.StudentDataValidator
+  loader: python_core.etl.loader.DatabaseLoader
+
+# ── Logging ───────────────────────────────────────────────────
+logging:
+  level: DEBUG            # DEBUG | INFO | WARNING | ERROR | CRITICAL
+  format: "%(asctime)s | %(name)-20s | %(levelname)-8s | %(message)s"
+  file: logs/erp.log
+  max_bytes: 10485760     # 10 MB
+  backup_count: 5

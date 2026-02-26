@@ -1,0 +1,361 @@
+{% extends "base.html" %}
+
+{% block title %}High-Performance Simulator{% endblock %}
+
+{% block content %}
+<style>
+    /* ── Terminal ───────────────────────────────────── */
+    .terminal-container {
+        background: #000;
+        color: #58a6ff;
+        font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+        padding: 20px;
+        border-radius: 8px;
+        height: 380px;
+        overflow-y: auto;
+        border: 1px solid #222;
+    }
+
+    .terminal-line {
+        margin: 0;
+        padding: 1px 0;
+        font-size: 13px;
+        line-height: 1.6;
+        white-space: pre-wrap;
+    }
+
+    .terminal-line .ts {
+        color: #444;
+        margin-right: 8px;
+    }
+
+    .terminal-line .metric {
+        color: #3fb950;
+    }
+
+    .terminal-line .info {
+        color: #58a6ff;
+    }
+
+    .terminal-line .sys {
+        color: #888;
+    }
+
+    /* ── Dispatch Buttons ─────────────────────────── */
+    .btn-group {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 16px;
+    }
+
+    .btn-inject {
+        background: #111;
+        color: #ededed;
+        border: 1px solid #333;
+        padding: 8px 20px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-family: inherit;
+    }
+
+    .btn-inject:hover {
+        background: #1a1a1a;
+        border-color: #58a6ff;
+        color: #58a6ff;
+    }
+
+    /* ── Stats Grid ────────────────────────────────── */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 16px;
+        margin-top: 12px;
+    }
+
+    .stat-pill {
+        background: #0a0a0a;
+        border: 1px solid #222;
+        border-radius: 8px;
+        padding: 20px;
+        text-align: center;
+    }
+
+    .stat-pill .label {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: #555;
+        margin-bottom: 8px;
+    }
+
+    .stat-pill .number {
+        font-size: 30px;
+        font-weight: 700;
+        color: #58a6ff;
+        letter-spacing: -0.04em;
+    }
+
+    /* ── DB Live Table ─────────────────────────────── */
+    .live-db-container {
+        max-height: 420px;
+        overflow-y: auto;
+        border-radius: 8px;
+        border: 1px solid #222;
+        background: #000;
+        margin-top: 12px;
+    }
+
+    .live-db-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+        color: #c9d1d9;
+    }
+
+    .live-db-table th {
+        background: #0a0a0a;
+        padding: 10px 16px;
+        font-weight: 500;
+        color: #555;
+        border-bottom: 1px solid #222;
+        position: sticky;
+        top: 0;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .live-db-table td {
+        padding: 10px 16px;
+        border-bottom: 1px solid #111;
+    }
+
+    .live-db-table tr:hover td {
+        background: #0a0a0a;
+    }
+
+    .new-row {
+        animation: rowFade 1.5s ease-out;
+    }
+
+    @keyframes rowFade {
+        from {
+            background: rgba(88, 166, 255, 0.12);
+        }
+
+        to {
+            background: transparent;
+        }
+    }
+</style>
+
+<div class="content-header">
+    <h1>Data Ingestion Simulator</h1>
+</div>
+
+<div class="card">
+    <h2>1. Dispatch Workload</h2>
+    <p style="color:#555; margin-top: 6px; font-size: 13px;">Select the number of records to ingest via RabbitMQ →
+        Python Worker → Postgres.</p>
+    <form method="post" action="/simulate/start" class="btn-group" onsubmit="clearTerminal()">
+        <button type="submit" name="count" value="10" class="btn-inject">10</button>
+        <button type="submit" name="count" value="100" class="btn-inject">100</button>
+        <button type="submit" name="count" value="1000" class="btn-inject">1K</button>
+        <button type="submit" name="count" value="10000" class="btn-inject">10K</button>
+        <button type="submit" name="count" value="50000" class="btn-inject">50K</button>
+        <button type="submit" name="count" value="100000" class="btn-inject">100K</button>
+    </form>
+</div>
+
+<div class="card">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <h2>2. Live Execution Terminal</h2>
+        <span id="socket-status" style="font-size: 12px; font-weight: 600; color: #d29922;">Connecting...</span>
+    </div>
+    <div class="terminal-container" id="terminal">
+        <p class="terminal-line"><span class="ts">[SYSTEM]</span><span class="sys"> Ready for ingestion
+                simulation...</span></p>
+    </div>
+</div>
+
+<div class="card">
+    <h2>3. Live Analysis Dashboard</h2>
+    <div class="stats-grid">
+        <div class="stat-pill">
+            <div class="label">Total Students</div>
+            <div class="number" id="stat-students">—</div>
+        </div>
+        <div class="stat-pill">
+            <div class="label">Active Rollouts</div>
+            <div class="number" id="stat-active">—</div>
+        </div>
+        <div class="stat-pill">
+            <div class="label">Courses</div>
+            <div class="number" id="stat-courses">—</div>
+        </div>
+        <div class="stat-pill">
+            <div class="label">Avg GPA</div>
+            <div class="number" id="stat-gpa">—</div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <h2>4. Live Database View</h2>
+        <span style="font-size: 12px; color: #555;">Polling top 50 rows · 1s refresh</span>
+    </div>
+    <div class="live-db-container" id="db-container">
+        <table class="live-db-table">
+            <thead>
+                <tr>
+                    <th>UUID</th>
+                    <th>Initials</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>GPA</th>
+                </tr>
+            </thead>
+            <tbody id="db-tbody"></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    const terminal = document.getElementById('terminal');
+    const socketStatus = document.getElementById('socket-status');
+    let ws;
+
+    const FAKE_LOGS = [
+        "Resolving dependencies...",
+        "Fetching entity_schema@1.0.4...",
+        "Mapping Postgres schema routes...",
+        "Committing memory blocks...",
+        "Allocating RabbitMQ nodes...",
+        "Finalizing database tx...",
+        "Verifying integrity checksums...",
+        "Syncing write-ahead log...",
+        "Indexing primary keys...",
+    ];
+
+    function connectWebSocket() {
+        const host = window.location.hostname;
+        ws = new WebSocket(`ws://${host}:3000/api/ws`);
+
+        ws.onopen = () => {
+            socketStatus.textContent = '● LIVE';
+            socketStatus.style.color = '#3fb950';
+        };
+
+        ws.onmessage = (event) => {
+            try {
+                const data = JSON.parse(event.data);
+
+                appendLog(`[BATCH] Job dispatched → ${data.job_id ? data.job_id.substring(0, 8) : '?'}`, 'info');
+
+                let delay = 0;
+                for (let i = 0; i < 6; i++) {
+                    setTimeout(() => {
+                        const log = FAKE_LOGS[Math.floor(Math.random() * FAKE_LOGS.length)];
+                        appendLog(log, 'sys');
+                    }, delay);
+                    delay += 40 + Math.random() * 80;
+                }
+
+                setTimeout(() => appendLog(data.log, 'metric'), delay + 60);
+            } catch (e) {
+                appendLog(event.data, 'sys');
+            }
+        };
+
+        ws.onclose = () => {
+            socketStatus.textContent = '● DISCONNECTED';
+            socketStatus.style.color = '#f85149';
+            setTimeout(connectWebSocket, 5000);
+        };
+
+        ws.onerror = () => {
+            socketStatus.textContent = '⚠ ERROR';
+            socketStatus.style.color = '#f85149';
+        };
+    }
+
+    function appendLog(message, type = 'metric') {
+        const line = document.createElement('p');
+        line.className = 'terminal-line';
+        const now = new Date().toTimeString().split(' ')[0];
+        line.innerHTML = `<span class="ts">[${now}]</span> <span class="${type}">${message}</span>`;
+        terminal.appendChild(line);
+        terminal.scrollTop = terminal.scrollHeight;
+    }
+
+    function clearTerminal() {
+        terminal.innerHTML = '';
+        appendLog('Dispatching workload to Rust Gateway...', 'info');
+    }
+
+    connectWebSocket();
+
+    // ── Polling Setup ──────────────────────────────
+    const host = window.location.hostname;
+    const API_URL = `http://${host}:3000/api`;
+    let seenDbRecords = new Set();
+    const tbody = document.getElementById('db-tbody');
+
+    async function fetchAnalytics() {
+        try {
+            const resp = await fetch(`${API_URL}/analytics/dashboard`);
+            if (resp.ok) {
+                const d = await resp.json();
+                document.getElementById('stat-students').innerText = d.total_students.toLocaleString();
+                document.getElementById('stat-active').innerText = d.active_students.toLocaleString();
+                document.getElementById('stat-courses').innerText = d.total_courses.toLocaleString();
+                document.getElementById('stat-gpa').innerText = d.average_gpa.toFixed(2);
+            }
+        } catch (e) { /* silent */ }
+    }
+
+    async function fetchDatabaseLive() {
+        try {
+            const resp = await fetch(`${API_URL}/students?limit=50&offset=0`);
+            if (resp.ok) {
+                const payload = await resp.json();
+                const students = payload.data || [];
+                const newStudents = students.filter(s => !seenDbRecords.has(s.id)).reverse();
+
+                newStudents.forEach(s => {
+                    seenDbRecords.add(s.id);
+                    const tr = document.createElement('tr');
+                    tr.className = 'new-row';
+                    const uuidShort = s.id.substring(0, 8);
+                    const initials = `${s.first_name[0] || ''}${s.last_name[0] || ''}`;
+                    const gpa = s.gpa != null ? Number(s.gpa).toFixed(2) : 'N/A';
+
+                    tr.innerHTML = `
+                        <td style="color:#444; font-family:monospace;">${uuidShort}</td>
+                        <td style="font-weight:700; color:#58a6ff;">${initials}</td>
+                        <td>${s.first_name} ${s.last_name}</td>
+                        <td style="color:#555;">${s.email}</td>
+                        <td style="color:#3fb950;">${gpa}</td>
+                    `;
+                    tbody.prepend(tr);
+                });
+
+                while (tbody.children.length > 200) {
+                    const last = tbody.lastElementChild;
+                    if (last) tbody.removeChild(last);
+                }
+            }
+        } catch (e) { /* silent */ }
+    }
+
+    setInterval(fetchAnalytics, 1500);
+    setInterval(fetchDatabaseLive, 1000);
+    fetchAnalytics();
+    fetchDatabaseLive();
+</script>
+{% endblock %}

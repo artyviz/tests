@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}University ERP{% endblock %}</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+    <div class="wrapper">
+        <aside class="sidebar">
+            <h2>University ERP</h2>
+            <nav>
+                <a href="/simulate" class="{% if page == 'simulate' %}active{% endif %}">Terminal Simulator</a>
+                <a href="/analysis" class="{% if page == 'analysis' %}active{% endif %}">System Analysis</a>
+            </nav>
+        </aside>
+        <main class="content">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+</body>
+
+</html>

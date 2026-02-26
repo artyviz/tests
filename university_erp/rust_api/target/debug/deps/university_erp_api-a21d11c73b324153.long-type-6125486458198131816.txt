@@ -1,0 +1,2 @@
+fn(Extension<lapin::Connection>, axum::Json<SimulateRequest>) -> impl futures_util::Future<Output = impl IntoResponse> {start_simulation}
+fn(Extension<lapin::Connection>, axum::Json<SimulateRequest>) -> impl futures_util::Future<Output = impl IntoResponse> {start_simulation}: Handler<_, _>

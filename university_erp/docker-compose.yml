@@ -1,0 +1,117 @@
+# ============================================================
+# University ERP — Docker Compose
+# ============================================================
+# Usage:
+#   docker compose up -d          ← start everything
+#   docker compose logs -f        ← watch all logs
+#   docker compose down -v        ← tear down + delete volumes
+# ============================================================
+
+services:
+  # ── PostgreSQL ───────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: erp_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: university_erp
+      POSTGRES_USER: erp_admin
+      POSTGRES_PASSWORD: erp_secret_2026
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./database/init.sql:/docker-entrypoint-initdb.d/01_init.sql
+      - ./database/seed.sql:/docker-entrypoint-initdb.d/02_seed.sql
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U erp_admin -d university_erp" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # ── RabbitMQ ─────────────────────────────────────────────────
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: erp_rabbitmq
+    restart: unless-stopped
+    ports:
+      - "5672:5672" # AMQP
+      - "15672:15672" # Management UI
+    healthcheck:
+      test: [ "CMD", "rabbitmq-diagnostics", "check_port_connectivity" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # ── Rust API Server ──────────────────────────────────────────
+  rust_api:
+    build:
+      context: ./rust_api
+      dockerfile: Dockerfile
+    container_name: erp_rust_api
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://erp_admin:erp_secret_2026@postgres:5432/university_erp
+      API_PORT: "3000"
+      RUST_LOG: university_erp_api=info,tower_http=info
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/%2f
+    ports:
+      - "3000:3000"
+
+  # ── FastAPI Frontend ─────────────────────────────────────────
+  web_app:
+    build:
+      context: ./web_app
+      dockerfile: Dockerfile
+    container_name: erp_web_app
+    restart: unless-stopped
+    depends_on:
+      - rust_api
+    environment:
+      RUST_API_URL: http://rust_api:3000
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./web_app/static:/app/static
+      - ./web_app/templates:/app/templates
+
+  # ── Python ETL Worker ────────────────────────────────────────
+  python_worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: erp_python_worker
+    restart: unless-stopped
+    profiles: [ "etl" ]
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      DB_PASSWORD: erp_secret_2026
+      DB_HOST: postgres
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/%2f
+    command: python main.py
+
+  # ── Test Runner (one-shot) ───────────────────────────────────
+  tests:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: erp_tests
+    profiles: [ "test" ]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_PASSWORD: erp_secret_2026
+    command: python -m pytest tests/ -v --tb=short
+
+volumes:
+  pgdata:
