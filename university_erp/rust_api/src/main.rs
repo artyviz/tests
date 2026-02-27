@@ -4,8 +4,6 @@ use axum::{routing::{get, post}, Router};
 use sqlx::postgres::PgPoolOptions;
 use tower_http::cors::{Any, CorsLayer};
 use tower_http::trace::TraceLayer;
-use tower::limit::RateLimitLayer;
-use std::time::Duration;
 use tracing_subscriber::EnvFilter;
 use tokio::sync::broadcast;
 use lapin::{options::*, types::FieldTable, Connection, ConnectionProperties};
@@ -41,7 +39,6 @@ async fn main() {
         .allow_methods(Any)
         .allow_headers(Any);
 
-    // Auth routes (public — no token needed)
     let auth_routes = Router::new()
         .route("/register", post(auth::register))
         .route("/login", post(auth::login))
@@ -57,7 +54,7 @@ async fn main() {
     let metrics_broadcast = handlers::ws::MetricsBroadcast { sender: metrics_tx.clone() };
 
     let amqp_channel = amqp_conn.create_channel().await.unwrap();
-    
+
     amqp_channel.exchange_declare(
         "metrics_exchange",
         lapin::ExchangeKind::Fanout,
@@ -102,8 +99,6 @@ async fn main() {
         .nest("/api", handlers::routes())
         .layer(cors)
         .layer(TraceLayer::new_for_http())
-        // Apply rate limiting middleware
-        // .layer(RateLimitLayer::new(100, Duration::from_secs(1)))
         .layer(axum::Extension(std::sync::Arc::new(amqp_conn)))
         .layer(axum::Extension(metrics_broadcast))
         .with_state(pool);

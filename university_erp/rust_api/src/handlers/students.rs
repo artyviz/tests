@@ -1,5 +1,5 @@
 use axum::{
-    extract::{Path, Query, State}, // Cache buster for sqlx schema sync
+    extract::{Path, Query, State},
     routing::{get, post, put, delete},
     Json, Router,
 };
@@ -22,7 +22,6 @@ pub fn routes() -> Router<Db> {
         .route("/search/:query", get(search))
 }
 
-/// GET /api/students
 async fn list(State(db): State<Db>, Query(p): Query<ListParams>) -> Result<Json<serde_json::Value>> {
     let limit = p.limit.unwrap_or(50);
     let offset = p.offset.unwrap_or(0);
@@ -46,7 +45,6 @@ async fn list(State(db): State<Db>, Query(p): Query<ListParams>) -> Result<Json<
     })))
 }
 
-/// GET /api/students/:id
 async fn show(State(db): State<Db>, Path(id): Path<Uuid>) -> Result<Json<Student>> {
     let q = format!("SELECT {} FROM students WHERE id = $1", COLS);
     let student = sqlx::query_as::<_, Student>(&q)
@@ -57,9 +55,7 @@ async fn show(State(db): State<Db>, Path(id): Path<Uuid>) -> Result<Json<Student
     Ok(Json(student))
 }
 
-/// POST /api/students
 async fn create(State(db): State<Db>, Json(input): Json<CreateStudent>) -> Result<Json<Student>> {
-    // Check duplicate email
     let exists: Option<(Uuid,)> =
         sqlx::query_as("SELECT id FROM students WHERE email = $1")
             .bind(&input.email)
@@ -91,7 +87,6 @@ async fn create(State(db): State<Db>, Json(input): Json<CreateStudent>) -> Resul
     Ok(Json(student))
 }
 
-/// PUT /api/students/:id
 async fn update(
     State(db): State<Db>,
     Path(id): Path<Uuid>,
@@ -115,7 +110,6 @@ async fn update(
     Ok(Json(student))
 }
 
-/// DELETE /api/students/:id
 async fn remove(State(db): State<Db>, Path(id): Path<Uuid>) -> Result<Json<serde_json::Value>> {
     let result = sqlx::query("DELETE FROM students WHERE id = $1")
         .bind(id)
@@ -128,13 +122,11 @@ async fn remove(State(db): State<Db>, Path(id): Path<Uuid>) -> Result<Json<serde
     Ok(Json(json!({ "deleted": true, "id": id })))
 }
 
-/// POST /api/students/:id/enroll
 async fn enroll(
     State(db): State<Db>,
     Path(id): Path<Uuid>,
     Json(input): Json<EnrollRequest>,
 ) -> Result<Json<Enrollment>> {
-    // Verify student exists
     let q = format!("SELECT {} FROM students WHERE id = $1", COLS);
     let _student = sqlx::query_as::<_, Student>(&q)
         .bind(id)
@@ -142,7 +134,6 @@ async fn enroll(
         .await?
         .ok_or_else(|| AppError::NotFound("Student not found".into()))?;
 
-    // Check capacity
     let enrolled_count: (i64,) = sqlx::query_as(
         "SELECT COUNT(*) FROM enrollments WHERE course_id = $1 AND status IN ('registered','in_progress')"
     )
@@ -176,7 +167,6 @@ async fn enroll(
     Ok(Json(enrollment))
 }
 
-/// POST /api/students/:id/grade
 async fn assign_grade(
     State(db): State<Db>,
     Path(id): Path<Uuid>,
@@ -205,7 +195,6 @@ async fn assign_grade(
     Ok(Json(enrollment))
 }
 
-/// GET /api/students/search/:query
 async fn search(State(db): State<Db>, Path(q): Path<String>) -> Result<Json<Vec<Student>>> {
     let pattern = format!("%{}%", q);
     let query = format!(

@@ -3,7 +3,6 @@ use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
 use uuid::Uuid;
 
-// ── Student ─────────────────────────────────────────
 #[derive(Debug, Clone, Serialize, Deserialize, FromRow)]
 pub struct Student {
     pub id: Uuid,
@@ -35,7 +34,6 @@ pub struct UpdateStudent {
     pub status: Option<String>,
 }
 
-// ── Course ──────────────────────────────────────────
 #[derive(Debug, Clone, Serialize, Deserialize, FromRow)]
 pub struct Course {
     pub id: Uuid,
@@ -58,7 +56,6 @@ pub struct CreateCourse {
     pub capacity: i32,
 }
 
-// ── Department ──────────────────────────────────────
 #[derive(Debug, Clone, Serialize, Deserialize, FromRow)]
 pub struct Department {
     pub id: Uuid,
@@ -69,7 +66,6 @@ pub struct Department {
     pub updated_at: DateTime<Utc>,
 }
 
-// ── Enrollment ──────────────────────────────────────
 #[derive(Debug, Clone, Serialize, Deserialize, FromRow)]
 pub struct Enrollment {
     pub id: Uuid,
@@ -94,7 +90,6 @@ pub struct GradeRequest {
     pub grade: String,
 }
 
-// ── Faculty ─────────────────────────────────────────
 #[derive(Debug, Clone, Serialize, Deserialize, FromRow)]
 pub struct Faculty {
     pub id: Uuid,
@@ -108,7 +103,6 @@ pub struct Faculty {
     pub updated_at: DateTime<Utc>,
 }
 
-// ── Analytics ───────────────────────────────────────
 #[derive(Debug, Serialize)]
 pub struct DashboardStats {
     pub total_students: i64,
@@ -126,7 +120,6 @@ pub struct DepartmentSummary {
     pub avg_gpa: f64,
 }
 
-// ── Query params ────────────────────────────────────
 #[derive(Debug, Deserialize)]
 pub struct ListParams {
     pub limit: Option<i64>,
@@ -136,7 +129,6 @@ pub struct ListParams {
     pub status: Option<String>,
 }
 
-// ── Enrollment with course details (JOIN result) ────
 #[derive(Debug, Clone, Serialize, FromRow)]
 pub struct EnrollmentDetail {
     pub id: Uuid,
@@ -149,4 +141,3 @@ pub struct EnrollmentDetail {
     pub course_title: String,
     pub credits: i32,
 }
-

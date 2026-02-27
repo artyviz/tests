@@ -17,27 +17,24 @@ use uuid::Uuid;
 use crate::db::Db;
 use crate::errors::{AppError, Result};
 
-// ── JWT secret (use env var in production) ──────────
 fn jwt_secret() -> String {
     std::env::var("JWT_SECRET").unwrap_or_else(|_| "erp-jwt-secret-change-in-prod".to_string())
 }
 
-// ── Claims embedded in the JWT ──────────────────────
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Claims {
-    pub sub: Uuid,       // user id
+    pub sub: Uuid,
     pub username: String,
-    pub role: String,    // admin, student, faculty
-    pub exp: usize,      // expiry (unix timestamp)
+    pub role: String,
+    pub exp: usize,
 }
 
-// ── Request / response types ────────────────────────
 #[derive(Debug, Deserialize)]
 pub struct RegisterRequest {
     pub username: String,
     pub email: String,
     pub password: String,
-    pub role: Option<String>,    // defaults to "student"
+    pub role: Option<String>,
     pub full_name: Option<String>,
 }
 
@@ -73,7 +70,6 @@ struct UserRow {
     is_active: bool,
 }
 
-// ── Hash password ───────────────────────────────────
 fn hash_password(password: &str) -> Result<String> {
     let salt = SaltString::generate(&mut OsRng);
     let hash = Argon2::default()
@@ -90,7 +86,6 @@ fn verify_password(password: &str, hash: &str) -> Result<bool> {
         .is_ok())
 }
 
-// ── Generate JWT ────────────────────────────────────
 fn create_token(user_id: Uuid, username: &str, role: &str) -> Result<String> {
     let expiry = Utc::now()
         .checked_add_signed(chrono::Duration::hours(24))
@@ -112,7 +107,6 @@ fn create_token(user_id: Uuid, username: &str, role: &str) -> Result<String> {
     .map_err(|e| AppError::Internal(format!("Token creation failed: {}", e)))
 }
 
-/// Parse and validate a JWT, returning the claims.
 pub fn decode_token(token: &str) -> Result<Claims> {
     let data = decode::<Claims>(
         token,
@@ -123,7 +117,6 @@ pub fn decode_token(token: &str) -> Result<Claims> {
     Ok(data.claims)
 }
 
-// ── Register ────────────────────────────────────────
 pub async fn register(State(db): State<Db>, Json(input): Json<RegisterRequest>) -> Result<Json<AuthResponse>> {
     if input.username.len() < 3 {
         return Err(AppError::Validation("Username must be at least 3 characters".into()));
@@ -132,7 +125,6 @@ pub async fn register(State(db): State<Db>, Json(input): Json<RegisterRequest>) 
         return Err(AppError::Validation("Password must be at least 6 characters".into()));
     }
 
-    // Check duplicate
     let exists: Option<(Uuid,)> = sqlx::query_as("SELECT id FROM users WHERE username = $1 OR email = $2")
         .bind(&input.username)
         .bind(&input.email)
@@ -165,7 +157,6 @@ pub async fn register(State(db): State<Db>, Json(input): Json<RegisterRequest>) 
     Ok(Json(AuthResponse { token, user }))
 }
 
-// ── Login ───────────────────────────────────────────
 pub async fn login(State(db): State<Db>, Json(input): Json<LoginRequest>) -> Result<Json<AuthResponse>> {
     let user = sqlx::query_as::<_, UserRow>(
         "SELECT id, username, email, password_hash, role, full_name, is_active FROM users WHERE username = $1"
@@ -197,7 +188,6 @@ pub async fn login(State(db): State<Db>, Json(input): Json<LoginRequest>) -> Res
     }))
 }
 
-// ── Get current user ────────────────────────────────
 pub async fn me(State(db): State<Db>, headers: HeaderMap) -> Result<Json<UserInfo>> {
     let claims = extract_claims(&headers)?;
     let user = sqlx::query_as::<_, UserInfo>(
@@ -210,7 +200,6 @@ pub async fn me(State(db): State<Db>, headers: HeaderMap) -> Result<Json<UserInf
     Ok(Json(user))
 }
 
-// ── Helper: extract claims from Authorization header ─
 fn extract_claims(headers: &HeaderMap) -> Result<Claims> {
     let auth_header = headers
         .get("Authorization")
@@ -224,7 +213,6 @@ fn extract_claims(headers: &HeaderMap) -> Result<Claims> {
     decode_token(token)
 }
 
-// ── Middleware: require authentication ───────────────
 pub async fn require_auth(
     headers: HeaderMap,
     mut request: Request,
@@ -235,7 +223,6 @@ pub async fn require_auth(
     Ok(next.run(request).await)
 }
 
-// ── Middleware: require admin role ───────────────────
 pub async fn require_admin(
     headers: HeaderMap,
     mut request: Request,

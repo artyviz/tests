@@ -11,7 +11,6 @@ pub mod ws;
 use axum::{routing::{get, post}, Router};
 use crate::db::Db;
 
-/// Mount all API routes under /api.
 pub fn routes() -> Router<Db> {
     Router::new()
         .nest("/students", students::routes())

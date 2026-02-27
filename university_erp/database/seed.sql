@@ -1,16 +1,7 @@
--- ============================================================
--- University ERP — Seed Data
--- ============================================================
--- Loaded after init.sql via Docker entrypoint alphabetical order
--- (02_seed.sql runs after 01_init.sql)
--- ============================================================
-
--- Only seed if departments table is empty
 DO $$
 BEGIN
     IF (SELECT COUNT(*) FROM departments) = 0 THEN
 
-        -- ── Departments ─────────────────────────────────────────
         INSERT INTO departments (id, name, code, budget) VALUES
             ('d0000001-0000-0000-0000-000000000001', 'Computer Science',    'CS',   2400000),
             ('d0000002-0000-0000-0000-000000000002', 'Mathematics',         'MATH', 1800000),
@@ -18,7 +9,6 @@ BEGIN
             ('d0000004-0000-0000-0000-000000000004', 'Electrical Engineering', 'EE', 2600000),
             ('d0000005-0000-0000-0000-000000000005', 'Mechanical Engineering', 'ME', 2200000);
 
-        -- ── Faculty ─────────────────────────────────────────────
         INSERT INTO faculty (id, first_name, last_name, email, department_id, rank) VALUES
             ('f0000001-0000-0000-0000-000000000001', 'Rajesh',   'Kumar',    'rajesh.k@uni.edu',    'd0000001-0000-0000-0000-000000000001', 'professor'),
             ('f0000002-0000-0000-0000-000000000002', 'Priya',    'Sharma',   'priya.s@uni.edu',     'd0000001-0000-0000-0000-000000000001', 'assistant_professor'),
@@ -29,7 +19,6 @@ BEGIN
             ('f0000007-0000-0000-0000-000000000007', 'James',    'Wilson',   'james.w@uni.edu',     'd0000005-0000-0000-0000-000000000005', 'associate_professor'),
             ('f0000008-0000-0000-0000-000000000008', 'Fatima',   'Hassan',   'fatima.h@uni.edu',    'd0000003-0000-0000-0000-000000000003', 'assistant_professor');
 
-        -- ── Courses ─────────────────────────────────────────────
         INSERT INTO courses (id, code, title, department_id, credits, capacity, instructor_id) VALUES
             ('c0000001-0000-0000-0000-000000000001', 'CS101',   'Introduction to Computer Science',  'd0000001-0000-0000-0000-000000000001', 3, 120, 'f0000001-0000-0000-0000-000000000001'),
             ('c0000002-0000-0000-0000-000000000002', 'CS201',   'Data Structures & Algorithms',      'd0000001-0000-0000-0000-000000000001', 4,  80, 'f0000002-0000-0000-0000-000000000002'),
@@ -41,7 +30,6 @@ BEGIN
             ('c0000008-0000-0000-0000-000000000008', 'EE201',   'Circuit Analysis',                  'd0000004-0000-0000-0000-000000000004', 3,  65, 'f0000005-0000-0000-0000-000000000005'),
             ('c0000009-0000-0000-0000-000000000009', 'ME101',   'Engineering Mechanics',             'd0000005-0000-0000-0000-000000000005', 3,  80, 'f0000007-0000-0000-0000-000000000007');
 
-        -- ── Students ────────────────────────────────────────────
         INSERT INTO students (id, first_name, last_name, email, date_of_birth, department_id, gpa, status) VALUES
             ('50000001-0000-0000-0000-000000000001', 'Aisha',   'Sharma',   'aisha.s@uni.edu',    '2003-05-14', 'd0000001-0000-0000-0000-000000000001', 3.98, 'active'),
             ('50000002-0000-0000-0000-000000000002', 'Rahul',   'Kumar',    'rahul.k@uni.edu',    '2002-11-28', 'd0000002-0000-0000-0000-000000000002', 3.72, 'active'),
@@ -56,7 +44,6 @@ BEGIN
             ('50000011-0000-0000-0000-000000000011', 'Carlos',  'Rivera',   'carlos.r@uni.edu',   '2002-02-14', 'd0000004-0000-0000-0000-000000000004', 3.33, 'active'),
             ('50000012-0000-0000-0000-000000000012', 'Zara',    'Khan',     'zara.k@uni.edu',     '2003-10-08', 'd0000001-0000-0000-0000-000000000001', 3.91, 'active');
 
-        -- ── Enrollments ─────────────────────────────────────────
         INSERT INTO enrollments (student_id, course_id, semester, status, grade) VALUES
             ('50000001-0000-0000-0000-000000000001', 'c0000001-0000-0000-0000-000000000001', 'Fall 2025',   'completed', 'A'),
             ('50000001-0000-0000-0000-000000000001', 'c0000002-0000-0000-0000-000000000002', 'Fall 2025',   'completed', 'A'),
@@ -80,8 +67,6 @@ BEGIN
             ('50000012-0000-0000-0000-000000000012', 'c0000001-0000-0000-0000-000000000001', 'Fall 2025',   'completed', 'A'),
             ('50000012-0000-0000-0000-000000000012', 'c0000002-0000-0000-0000-000000000002', 'Spring 2026', 'in_progress', NULL);
 
-        -- ── Default admin user (password: admin123) ─────────────
-        -- Argon2 hash generated for "admin123"
         INSERT INTO users (username, email, password_hash, role, full_name) VALUES
             ('admin', 'admin@uni.edu',
              '$argon2id$v=19$m=19456,t=2,p=1$ZmFrZXNhbHQxMjM0NTY$VGhpcyBpcyBhIHBsYWNlaG9sZGVyIGhhc2g',

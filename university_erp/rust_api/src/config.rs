@@ -1,4 +1,3 @@
-/// Environment-based configuration.
 pub struct Config {
     pub database_url: String,
     pub rabbitmq_url: String,

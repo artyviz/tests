@@ -1,13 +1,3 @@
-"""
-University ERP — FastAPI Web Frontend
-
-Server-rendered Jinja2 templates that proxy to the Rust API.
-This layer NEVER touches the database directly.
-
-Includes reverse-proxy routes so the browser only needs port 8000
-(critical for GitHub Codespaces where each port gets a unique hostname).
-"""
-
 import os
 import asyncio
 
@@ -36,7 +26,6 @@ async def api_post(path: str, data: dict):
 async def index():
     return RedirectResponse(url="/simulate", status_code=302)
 
-# ── Simulation & Terminal Feed ───────────────────────
 @app.get("/simulate", response_class=HTMLResponse)
 async def simulate_page(request: Request):
     return templates.TemplateResponse("simulate.html", {
@@ -49,7 +38,6 @@ async def simulate_start(request: Request, count: int = Form(...)):
     await api_post("/api/simulate", {"count": count})
     return RedirectResponse(url="/simulate", status_code=303)
 
-# ── Analysis & System Metrics ────────────────────────
 @app.get("/analysis", response_class=HTMLResponse)
 async def analysis_page(request: Request):
     return templates.TemplateResponse("analysis.html", {
@@ -65,8 +53,6 @@ async def system_metrics():
         "active_connections": len(psutil.net_connections(kind='inet')),
     }
 
-# ── Reverse Proxy: REST API ─────────────────────────
-# Proxies GET/POST to the Rust API so the browser only needs port 8000.
 @app.api_route("/proxy/api/{path:path}", methods=["GET", "POST", "PUT", "DELETE"])
 async def proxy_api(request: Request, path: str):
     url = f"{API}/api/{path}"
@@ -92,8 +78,6 @@ async def proxy_api(request: Request, path: str):
         media_type=resp.headers.get("content-type", "application/json"),
     )
 
-# ── Reverse Proxy: WebSocket relay ───────────────────
-# Relays messages from ws://rust_api:3000/api/ws → browser via port 8000.
 @app.websocket("/ws/live")
 async def websocket_proxy(ws: WebSocket):
     await ws.accept()
@@ -111,7 +95,6 @@ async def websocket_proxy(ws: WebSocket):
             task = asyncio.create_task(forward())
             try:
                 while True:
-                    # Keep connection alive; read browser messages (if any)
                     await ws.receive_text()
             except WebSocketDisconnect:
                 pass
