@@ -161,14 +161,14 @@
     <h2>1. Dispatch Workload</h2>
     <p style="color:#555; margin-top: 6px; font-size: 13px;">Select the number of records to ingest via RabbitMQ →
         Python Worker → Postgres.</p>
-    <form method="post" action="/simulate/start" class="btn-group" onsubmit="clearTerminal()">
-        <button type="submit" name="count" value="10" class="btn-inject">10</button>
-        <button type="submit" name="count" value="100" class="btn-inject">100</button>
-        <button type="submit" name="count" value="1000" class="btn-inject">1K</button>
-        <button type="submit" name="count" value="10000" class="btn-inject">10K</button>
-        <button type="submit" name="count" value="50000" class="btn-inject">50K</button>
-        <button type="submit" name="count" value="100000" class="btn-inject">100K</button>
-    </form>
+    <div class="btn-group">
+        <button onclick="dispatchWorkload(10)" class="btn-inject">10</button>
+        <button onclick="dispatchWorkload(100)" class="btn-inject">100</button>
+        <button onclick="dispatchWorkload(1000)" class="btn-inject">1K</button>
+        <button onclick="dispatchWorkload(10000)" class="btn-inject">10K</button>
+        <button onclick="dispatchWorkload(50000)" class="btn-inject">50K</button>
+        <button onclick="dispatchWorkload(100000)" class="btn-inject">100K</button>
+    </div>
 </div>
 
 <div class="card">
@@ -243,8 +243,8 @@
     ];
 
     function connectWebSocket() {
-        const host = window.location.hostname;
-        ws = new WebSocket(`ws://${host}:3000/api/ws`);
+        const wsProto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        ws = new WebSocket(`${wsProto}//${window.location.host}/ws/live`);
 
         ws.onopen = () => {
             socketStatus.textContent = '● LIVE';
@@ -298,11 +298,23 @@
         appendLog('Dispatching workload to Rust Gateway...', 'info');
     }
 
+    async function dispatchWorkload(count) {
+        clearTerminal();
+        try {
+            await fetch('/proxy/api/simulate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ count: count })
+            });
+        } catch (e) {
+            appendLog('Failed to dispatch workload: ' + e.message, 'sys');
+        }
+    }
+
     connectWebSocket();
 
     // ── Polling Setup ──────────────────────────────
-    const host = window.location.hostname;
-    const API_URL = `http://${host}:3000/api`;
+    const API_URL = '/proxy/api';
     let seenDbRecords = new Set();
     const tbody = document.getElementById('db-tbody');
 

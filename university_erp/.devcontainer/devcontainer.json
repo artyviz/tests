@@ -1,0 +1,21 @@
+{
+  "name": "University ERP",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
+  "forwardPorts": [8000, 3000, 15672],
+  "portsAttributes": {
+    "8000": { "label": "Web App", "onAutoForward": "openBrowser" },
+    "3000": { "label": "Rust API", "onAutoForward": "silent" },
+    "15672": { "label": "RabbitMQ UI", "onAutoForward": "silent" }
+  },
+  "postCreateCommand": "bash .devcontainer/setup.sh",
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash"
+      }
+    }
+  }
+}

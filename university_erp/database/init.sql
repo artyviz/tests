@@ -90,7 +90,7 @@ CREATE TABLE IF NOT EXISTS students (
                                  'active', 'inactive', 'graduated',
                                  'suspended', 'on_leave'
                              )),
-    gpa                  NUMERIC(3, 2) DEFAULT 0.00,
+    gpa                  FLOAT8 DEFAULT 0.00,
     enrolled_course_ids  UUID[] DEFAULT '{}',
     completed_course_ids UUID[] DEFAULT '{}',
     created_at           TIMESTAMPTZ NOT NULL DEFAULT NOW(),
