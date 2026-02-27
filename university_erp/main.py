@@ -104,8 +104,36 @@ def start_message_consumer(config: Dict[str, Any], db_pool: Any) -> None:
         from python_core.etl.generator import generate_students
         from python_core.repository.student_repo import StudentRepository
 
-        params = pika.URLParameters(rabbitmq_url)
-        connection = pika.BlockingConnection(params)
+        # Retry logic for connection
+        max_retries = 5
+        retry_count = 0
+        connection = None
+        
+        while retry_count < max_retries and connection is None:
+            try:
+                params = pika.URLParameters(rabbitmq_url)
+                params.connection_attempts = 3
+                params.retry_delay = 2
+                params.socket_timeout = 5.0
+                
+                connection = pika.BlockingConnection(params)
+                log.info("Successfully connected to RabbitMQ")
+                break
+            except Exception as conn_err:
+                retry_count += 1
+                log.warning(
+                    "Failed to connect to RabbitMQ (attempt %d/%d): %s",
+                    retry_count,
+                    max_retries,
+                    str(conn_err)
+                )
+                if retry_count < max_retries:
+                    log.info("Retrying in 5 seconds...")
+                    time.sleep(5)
+                else:
+                    log.error("Max retries reached. Exiting.")
+                    raise
+
         channel = connection.channel()
 
         # Input task queue from Rust
@@ -173,20 +201,44 @@ def start_message_consumer(config: Dict[str, Any], db_pool: Any) -> None:
         log.info("Worker ready — waiting for tasks on 'generation_queue'. Press Ctrl+C to exit.")
         channel.start_consuming()
 
-    except ImportError:
-        log.warning("pika not installed — running in standalone dev mode")
+    except ImportError as ie:
+        log.warning("pika not installed — running in standalone dev mode: %s", ie)
         # Block until SIGINT
         signal.pause() if hasattr(signal, "pause") else input("Press Enter to exit...\n")
     except Exception as exc:
-        log.error("Worker failed: %s", exc)
+        log.error("Worker failed with exception: %s", exc, exc_info=True)
         raise
 
 
 def main() -> None:
-    config = load_config()
-    configure_logging(config)
-    db_pool = connect_database(config)
-    start_message_consumer(config, db_pool)
+    try:
+        config = load_config()
+        configure_logging(config)
+        
+        log = ERPLogger.get_logger("main")
+        log.info("=" * 60)
+        log.info("Starting University ERP Python Worker")
+        log.info("=" * 60)
+        
+        log.info("Loading configuration and initializing database...")
+        db_pool = connect_database(config)
+        
+        if db_pool:
+            log.info("Database pool initialized successfully")
+        else:
+            log.warning("Database pool not available - some features may not work")
+        
+        log.info("Starting message consumer...")
+        start_message_consumer(config, db_pool)
+        
+    except ConfigurationError as cfg_err:
+        print(f"FATAL: Configuration error: {cfg_err}", file=sys.stderr)
+        sys.exit(1)
+    except Exception as e:
+        print(f"FATAL: Unexpected error: {e}", file=sys.stderr)
+        import traceback
+        traceback.print_exc(file=sys.stderr)
+        sys.exit(1)
 
 
 if __name__ == "__main__":

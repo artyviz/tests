@@ -34,14 +34,18 @@ services:
     image: rabbitmq:3-management-alpine
     container_name: erp_rabbitmq
     restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
     ports:
       - "5672:5672" # AMQP
       - "15672:15672" # Management UI
     healthcheck:
-      test: [ "CMD", "rabbitmq-diagnostics", "check_port_connectivity" ]
-      interval: 5s
+      test: [ "CMD", "rabbitmq-diagnostics", "ping" ]
+      interval: 10s
       timeout: 5s
-      retries: 10
+      retries: 5
+      start_period: 30s
 
   # ── Rust API Server ──────────────────────────────────────────
   rust_api:
@@ -94,10 +98,23 @@ services:
       rabbitmq:
         condition: service_healthy
     environment:
-      DB_PASSWORD: erp_secret_2026
       DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_NAME: university_erp
+      DB_USER: erp_admin
+      DB_PASSWORD: erp_secret_2026
       RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/%2f
+      MQ_HOST: rabbitmq
+      MQ_PORT: "5672"
+      PYTHONUNBUFFERED: "1"
+      LOG_LEVEL: INFO
     command: python main.py
+    healthcheck:
+      test: [ "CMD-SHELL", "python -c 'import pika; pika.BlockingConnection(pika.URLParameters(\"amqp://guest:guest@rabbitmq:5672/%2f\"))' || echo 'not ready'" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
 
   # ── Test Runner (one-shot) ───────────────────────────────────
   tests:

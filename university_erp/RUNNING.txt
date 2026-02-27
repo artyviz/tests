@@ -36,7 +36,9 @@ PREREQUISITES
 
       docker compose --profile etl up -d
 
-  Wait ~10 seconds for Postgres and RabbitMQ health checks to pass.
+  ⚠️  IMPORTANT: The worker won't start without the --profile etl flag!
+
+  Wait ~15 seconds for Postgres and RabbitMQ health checks to pass.
 
 
 ================================================================================
@@ -132,9 +134,36 @@ PREREQUISITES
 
   Problem: Terminal in /simulate stays empty after clicking a batch
   Fix:     Check python_worker is running:
-               docker logs erp_python_worker --tail 20
-           If it's crash-looping, rebuild:
+               docker ps | grep python_worker
+           If not listed or shows "Restarting", check logs:
+               docker logs erp_python_worker --tail 50
+           Common issues:
+             • Worker not started: Use `docker compose --profile etl up -d`
+             • RabbitMQ connection failure: Wait 30s, then restart worker:
+                 docker compose --profile etl up -d python_worker
+             • Database connection issue: Verify postgres is healthy:
+                 docker ps | grep postgres  (should show "healthy")
+           To debug in detail, rebuild and restart with output:
                docker compose build python_worker
+               docker compose --profile etl up python_worker
+
+  Problem: python_worker keeps restarting (status "Restarting (1)")
+  Fix:     This means the worker crashes on startup. Run diagnostics:
+               # Check full service logs
+               docker logs erp_python_worker --tail 100
+               # Verify dependencies are running
+               docker compose ps
+               # Ensure RabbitMQ is reachable
+               docker exec erp_python_worker python -c \
+                 "import pika; pika.BlockingConnection(pika.URLParameters('amqp://guest:guest@rabbitmq:5672/%2f'))"
+               # Check environment variables in the container
+               docker exec erp_python_worker env | grep -E "DB_|RABBIT"
+           If RabbitMQ connection times out, wait longer and try again.
+           If database connection fails, verify postgres started with correct credentials.
+
+  Problem: Worker exits with "ModuleNotFoundError"
+  Fix:     The Docker image may have cached stale dependencies. Rebuild:
+               docker compose build --no-cache python_worker
                docker compose --profile etl up -d python_worker
 
   Problem: /api/students returns 500 error
