@@ -10,6 +10,8 @@ use crate::db::Db;
 use crate::errors::{AppError, Result};
 use crate::models::*;
 
+const COLS: &str = "id, first_name, last_name, email, department_id, rank, is_active, created_at, updated_at";
+
 pub fn routes() -> Router<Db> {
     Router::new()
         .route("/", get(list))
@@ -20,9 +22,8 @@ async fn list(State(db): State<Db>, Query(p): Query<ListParams>) -> Result<Json<
     let limit = p.limit.unwrap_or(50);
     let offset = p.offset.unwrap_or(0);
 
-    let faculty = sqlx::query_as::<_, Faculty>(
-        r#"SELECT * FROM faculty ORDER BY last_name ASC LIMIT $1 OFFSET $2"#
-    )
+    let q = format!("SELECT {} FROM faculty ORDER BY last_name ASC LIMIT $1 OFFSET $2", COLS);
+    let faculty = sqlx::query_as::<_, Faculty>(&q)
     .bind(limit)
     .bind(offset)
     .fetch_all(&db)
@@ -36,7 +37,8 @@ async fn list(State(db): State<Db>, Query(p): Query<ListParams>) -> Result<Json<
 }
 
 async fn show(State(db): State<Db>, Path(id): Path<Uuid>) -> Result<Json<Faculty>> {
-    let f = sqlx::query_as::<_, Faculty>("SELECT * FROM faculty WHERE id = $1")
+    let q = format!("SELECT {} FROM faculty WHERE id = $1", COLS);
+    let f = sqlx::query_as::<_, Faculty>(&q)
         .bind(id)
         .fetch_optional(&db)
         .await?

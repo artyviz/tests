@@ -10,7 +10,7 @@ pub fn routes() -> Router<Db> {
 
 async fn list(State(db): State<Db>) -> Result<Json<Vec<Department>>> {
     let depts = sqlx::query_as::<_, Department>(
-        "SELECT * FROM departments ORDER BY name ASC"
+        "SELECT id, name, code, budget::float8, created_at, updated_at FROM departments ORDER BY name ASC"
     )
     .fetch_all(&db)
     .await?;

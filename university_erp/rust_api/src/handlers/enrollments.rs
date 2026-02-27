@@ -11,6 +11,9 @@ use crate::db::Db;
 use crate::errors::{AppError, Result};
 use crate::models::*;
 
+const ENROLL_COLS: &str = "id, student_id, course_id, semester, status, grade, created_at, updated_at";
+const COURSE_COLS: &str = "id, code, title, department_id, credits, capacity, is_active, created_at, updated_at";
+
 pub fn routes() -> Router<Db> {
     Router::new()
         .route("/", get(list))
@@ -22,9 +25,8 @@ pub fn routes() -> Router<Db> {
 async fn list(State(db): State<Db>, Query(p): Query<ListParams>) -> Result<Json<serde_json::Value>> {
     let limit = p.limit.unwrap_or(50);
 
-    let enrollments = sqlx::query_as::<_, Enrollment>(
-        "SELECT * FROM enrollments ORDER BY created_at DESC LIMIT $1"
-    )
+    let q = format!("SELECT {} FROM enrollments ORDER BY created_at DESC LIMIT $1", ENROLL_COLS);
+    let enrollments = sqlx::query_as::<_, Enrollment>(&q)
     .bind(limit)
     .fetch_all(&db)
     .await?;
@@ -68,7 +70,8 @@ async fn enroll(State(db): State<Db>, Json(input): Json<EnrollInput>) -> Result<
         .ok_or_else(|| AppError::NotFound("Student not found".into()))?;
 
     // Check course exists + capacity
-    let course = sqlx::query_as::<_, Course>("SELECT * FROM courses WHERE id = $1")
+    let cq = format!("SELECT {} FROM courses WHERE id = $1", COURSE_COLS);
+    let course = sqlx::query_as::<_, Course>(&cq)
         .bind(input.course_id)
         .fetch_optional(&db)
         .await?
@@ -99,11 +102,12 @@ async fn enroll(State(db): State<Db>, Json(input): Json<EnrollInput>) -> Result<
         return Err(AppError::Duplicate("Already enrolled in this course for this semester".into()));
     }
 
-    let enrollment = sqlx::query_as::<_, Enrollment>(
-        r#"INSERT INTO enrollments (id, student_id, course_id, semester, status)
-           VALUES ($1, $2, $3, $4, 'registered')
-           RETURNING *"#
-    )
+    let ret = format!("RETURNING {}", ENROLL_COLS);
+    let q = format!(
+        "INSERT INTO enrollments (id, student_id, course_id, semester, status) VALUES ($1, $2, $3, $4, 'registered') {}",
+        ret
+    );
+    let enrollment = sqlx::query_as::<_, Enrollment>(&q)
     .bind(Uuid::new_v4())
     .bind(input.student_id)
     .bind(input.course_id)

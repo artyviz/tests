@@ -5,6 +5,8 @@ use crate::db::Db;
 use crate::errors::Result;
 use crate::models::*;
 
+const STUDENT_COLS: &str = "id, first_name, last_name, email, date_of_birth, department_id, gpa, status, created_at, updated_at";
+
 pub fn routes() -> Router<Db> {
     Router::new()
         .route("/dashboard", get(dashboard))
@@ -53,9 +55,11 @@ async fn department_summary(State(db): State<Db>) -> Result<Json<Vec<DepartmentS
 }
 
 async fn top_students(State(db): State<Db>) -> Result<Json<serde_json::Value>> {
-    let students = sqlx::query_as::<_, Student>(
-        r#"SELECT * FROM students WHERE gpa >= 3.5 ORDER BY gpa DESC LIMIT 20"#
-    )
+    let q = format!(
+        "SELECT {} FROM students WHERE gpa >= 3.5 ORDER BY gpa DESC LIMIT 20",
+        STUDENT_COLS
+    );
+    let students = sqlx::query_as::<_, Student>(&q)
     .fetch_all(&db)
     .await?;
 

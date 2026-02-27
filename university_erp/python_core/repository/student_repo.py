@@ -151,7 +151,7 @@ class StudentRepository(PostgresRepository):
                 cursor, sql, data_tuples, page_size=1000
             )
             self._conn.commit()
-            return len(records)
+            return cursor.rowcount
         except Exception as exc:
             self._conn.rollback()
             raise RepositoryError("bulk_insert", str(exc)) from exc

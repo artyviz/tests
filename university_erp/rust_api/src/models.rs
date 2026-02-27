@@ -44,7 +44,7 @@ pub struct Course {
     pub department_id: Option<Uuid>,
     pub credits: i32,
     pub capacity: i32,
-    pub status: String,
+    pub is_active: bool,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
 }
@@ -103,7 +103,7 @@ pub struct Faculty {
     pub email: String,
     pub department_id: Option<Uuid>,
     pub rank: String,
-    pub status: String,
+    pub is_active: bool,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
 }

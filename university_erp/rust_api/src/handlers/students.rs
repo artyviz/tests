@@ -10,6 +10,9 @@ use crate::db::Db;
 use crate::errors::{AppError, Result};
 use crate::models::*;
 
+const COLS: &str = "id, first_name, last_name, email, date_of_birth, department_id, gpa, status, created_at, updated_at";
+const COURSE_COLS: &str = "id, code, title, department_id, credits, capacity, is_active, created_at, updated_at";
+
 pub fn routes() -> Router<Db> {
     Router::new()
         .route("/", get(list).post(create))
@@ -24,9 +27,8 @@ async fn list(State(db): State<Db>, Query(p): Query<ListParams>) -> Result<Json<
     let limit = p.limit.unwrap_or(50);
     let offset = p.offset.unwrap_or(0);
 
-    let students = sqlx::query_as::<_, Student>(
-        r#"SELECT * FROM students ORDER BY created_at DESC LIMIT $1 OFFSET $2"#
-    )
+    let q = format!("SELECT {} FROM students ORDER BY created_at DESC LIMIT $1 OFFSET $2", COLS);
+    let students = sqlx::query_as::<_, Student>(&q)
     .bind(limit)
     .bind(offset)
     .fetch_all(&db)
@@ -46,7 +48,8 @@ async fn list(State(db): State<Db>, Query(p): Query<ListParams>) -> Result<Json<
 
 /// GET /api/students/:id
 async fn show(State(db): State<Db>, Path(id): Path<Uuid>) -> Result<Json<Student>> {
-    let student = sqlx::query_as::<_, Student>("SELECT * FROM students WHERE id = $1")
+    let q = format!("SELECT {} FROM students WHERE id = $1", COLS);
+    let student = sqlx::query_as::<_, Student>(&q)
         .bind(id)
         .fetch_optional(&db)
         .await?
@@ -70,11 +73,12 @@ async fn create(State(db): State<Db>, Json(input): Json<CreateStudent>) -> Resul
     }
 
     let id = Uuid::new_v4();
-    let student = sqlx::query_as::<_, Student>(
-        r#"INSERT INTO students (id, first_name, last_name, email, date_of_birth, department_id, gpa, status)
-           VALUES ($1, $2, $3, $4, $5, $6, 0.0, 'active')
-           RETURNING *"#
-    )
+    let ret = format!("RETURNING {}", COLS);
+    let q = format!(
+        "INSERT INTO students (id, first_name, last_name, email, date_of_birth, department_id, gpa, status) VALUES ($1, $2, $3, $4, $5, $6, 0.0, 'active') {}",
+        ret
+    );
+    let student = sqlx::query_as::<_, Student>(&q)
     .bind(id)
     .bind(&input.first_name)
     .bind(&input.last_name)
@@ -93,17 +97,12 @@ async fn update(
     Path(id): Path<Uuid>,
     Json(input): Json<UpdateStudent>,
 ) -> Result<Json<Student>> {
-    // Build dynamic update
-    let student = sqlx::query_as::<_, Student>(
-        r#"UPDATE students SET
-              first_name = COALESCE($2, first_name),
-              last_name  = COALESCE($3, last_name),
-              email      = COALESCE($4, email),
-              status     = COALESCE($5, status),
-              updated_at = NOW()
-           WHERE id = $1
-           RETURNING *"#
-    )
+    let ret = format!("RETURNING {}", COLS);
+    let q = format!(
+        "UPDATE students SET first_name = COALESCE($2, first_name), last_name = COALESCE($3, last_name), email = COALESCE($4, email), status = COALESCE($5, status), updated_at = NOW() WHERE id = $1 {}",
+        ret
+    );
+    let student = sqlx::query_as::<_, Student>(&q)
     .bind(id)
     .bind(&input.first_name)
     .bind(&input.last_name)
@@ -136,7 +135,8 @@ async fn enroll(
     Json(input): Json<EnrollRequest>,
 ) -> Result<Json<Enrollment>> {
     // Verify student exists
-    let _student = sqlx::query_as::<_, Student>("SELECT * FROM students WHERE id = $1")
+    let q = format!("SELECT {} FROM students WHERE id = $1", COLS);
+    let _student = sqlx::query_as::<_, Student>(&q)
         .bind(id)
         .fetch_optional(&db)
         .await?
@@ -150,7 +150,8 @@ async fn enroll(
     .fetch_one(&db)
     .await?;
 
-    let course = sqlx::query_as::<_, Course>("SELECT * FROM courses WHERE id = $1")
+    let cq = format!("SELECT {} FROM courses WHERE id = $1", COURSE_COLS);
+    let course = sqlx::query_as::<_, Course>(&cq)
         .bind(input.course_id)
         .fetch_optional(&db)
         .await?
@@ -163,7 +164,7 @@ async fn enroll(
     let enrollment = sqlx::query_as::<_, Enrollment>(
         r#"INSERT INTO enrollments (id, student_id, course_id, semester, status)
            VALUES ($1, $2, $3, $4, 'registered')
-           RETURNING *"#
+           RETURNING id, student_id, course_id, semester, status, grade, created_at, updated_at"#
     )
     .bind(Uuid::new_v4())
     .bind(id)
@@ -191,7 +192,7 @@ async fn assign_grade(
     let enrollment = sqlx::query_as::<_, Enrollment>(
         r#"UPDATE enrollments SET grade = $1, status = $2, updated_at = NOW()
            WHERE student_id = $3 AND course_id = $4
-           RETURNING *"#
+           RETURNING id, student_id, course_id, semester, status, grade, created_at, updated_at"#
     )
     .bind(&input.grade)
     .bind(status)
@@ -207,11 +208,11 @@ async fn assign_grade(
 /// GET /api/students/search/:query
 async fn search(State(db): State<Db>, Path(q): Path<String>) -> Result<Json<Vec<Student>>> {
     let pattern = format!("%{}%", q);
-    let students = sqlx::query_as::<_, Student>(
-        r#"SELECT * FROM students
-           WHERE first_name ILIKE $1 OR last_name ILIKE $1 OR email ILIKE $1
-           LIMIT 50"#
-    )
+    let query = format!(
+        "SELECT {} FROM students WHERE first_name ILIKE $1 OR last_name ILIKE $1 OR email ILIKE $1 LIMIT 50",
+        COLS
+    );
+    let students = sqlx::query_as::<_, Student>(&query)
     .bind(&pattern)
     .fetch_all(&db)
     .await?;

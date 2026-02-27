@@ -10,6 +10,8 @@ use crate::db::Db;
 use crate::errors::{AppError, Result};
 use crate::models::*;
 
+const COLS: &str = "id, code, title, department_id, credits, capacity, is_active, created_at, updated_at";
+
 pub fn routes() -> Router<Db> {
     Router::new()
         .route("/", get(list).post(create))
@@ -20,9 +22,8 @@ async fn list(State(db): State<Db>, Query(p): Query<ListParams>) -> Result<Json<
     let limit = p.limit.unwrap_or(50);
     let offset = p.offset.unwrap_or(0);
 
-    let courses = sqlx::query_as::<_, Course>(
-        "SELECT * FROM courses ORDER BY code ASC LIMIT $1 OFFSET $2"
-    )
+    let q = format!("SELECT {} FROM courses ORDER BY code ASC LIMIT $1 OFFSET $2", COLS);
+    let courses = sqlx::query_as::<_, Course>(&q)
     .bind(limit)
     .bind(offset)
     .fetch_all(&db)
@@ -36,7 +37,8 @@ async fn list(State(db): State<Db>, Query(p): Query<ListParams>) -> Result<Json<
 }
 
 async fn show(State(db): State<Db>, Path(id): Path<Uuid>) -> Result<Json<Course>> {
-    let course = sqlx::query_as::<_, Course>("SELECT * FROM courses WHERE id = $1")
+    let q = format!("SELECT {} FROM courses WHERE id = $1", COLS);
+    let course = sqlx::query_as::<_, Course>(&q)
         .bind(id)
         .fetch_optional(&db)
         .await?
@@ -45,18 +47,19 @@ async fn show(State(db): State<Db>, Path(id): Path<Uuid>) -> Result<Json<Course>
 }
 
 async fn create(State(db): State<Db>, Json(input): Json<CreateCourse>) -> Result<Json<Course>> {
-    if input.credits < 1 || input.credits > 6 {
-        return Err(AppError::Validation("Credits must be 1–6".into()));
+    if input.credits < 1 || input.credits > 12 {
+        return Err(AppError::Validation("Credits must be 1–12".into()));
     }
     if input.capacity < 1 {
         return Err(AppError::Validation("Capacity must be positive".into()));
     }
 
-    let course = sqlx::query_as::<_, Course>(
-        r#"INSERT INTO courses (id, code, title, department_id, credits, capacity, status)
-           VALUES ($1, $2, $3, $4, $5, $6, 'active')
-           RETURNING *"#
-    )
+    let ret = format!("RETURNING {}", COLS);
+    let q = format!(
+        "INSERT INTO courses (id, code, title, department_id, credits, capacity) VALUES ($1, $2, $3, $4, $5, $6) {}",
+        ret
+    );
+    let course = sqlx::query_as::<_, Course>(&q)
     .bind(Uuid::new_v4())
     .bind(&input.code)
     .bind(&input.title)
@@ -74,10 +77,12 @@ async fn update(
     Path(id): Path<Uuid>,
     Json(input): Json<CreateCourse>,
 ) -> Result<Json<Course>> {
-    let course = sqlx::query_as::<_, Course>(
-        r#"UPDATE courses SET code=$2, title=$3, department_id=$4, credits=$5, capacity=$6, updated_at=NOW()
-           WHERE id=$1 RETURNING *"#
-    )
+    let ret = format!("RETURNING {}", COLS);
+    let q = format!(
+        "UPDATE courses SET code=$2, title=$3, department_id=$4, credits=$5, capacity=$6, updated_at=NOW() WHERE id=$1 {}",
+        ret
+    );
+    let course = sqlx::query_as::<_, Course>(&q)
     .bind(id)
     .bind(&input.code)
     .bind(&input.title)
