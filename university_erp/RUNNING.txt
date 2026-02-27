@@ -28,17 +28,16 @@ PREREQUISITES
   STEP 2 — START THE STACK
 ================================================================================
 
-  Start all core services (Postgres, RabbitMQ, Rust API, Web App):
+  Start all services (Postgres, RabbitMQ, Rust API, Web App, Python Worker):
 
       docker compose up -d
 
-  Start the Python ETL worker in addition:
-
-      docker compose --profile etl up -d
-
-  ⚠️  IMPORTANT: The worker won't start without the --profile etl flag!
-
   Wait ~15 seconds for Postgres and RabbitMQ health checks to pass.
+  
+  ⚠️  If Postgres healthcheck fails, run:
+
+      docker compose down -v
+      docker compose up -d
 
 
 ================================================================================
@@ -102,7 +101,17 @@ PREREQUISITES
 
       docker logs -f erp_python_worker    ← ETL batch processing
       docker logs -f erp_rust_api         ← API requests / WebSocket events
-      docker logs -f erp_web_app          ← Frontend requests
+            # Check all container statuses
+      docker compose ps
+      
+      # Check Rust API is responding to HTTP
+      curl -v http://localhost:3000/api/analytics/dashboard
+      
+      # Check Rust API logs for errors
+      docker logs erp_rust_api --tail 30
+      
+      # Check if web app can see port 3000
+      docker exec erp_web_app curl -v http://rust_api:3000/api/analytics/dashboard         ← Frontend requests
 
   RabbitMQ management UI (optional):
 
@@ -128,9 +137,30 @@ PREREQUISITES
   TROUBLESHOOTING
 ================================================================================
 
-  Problem: Rust API container exits immediately after starting
-  Fix:     docker compose build --no-cache rust_api
-           docker compose up -d rust_api
+  Problem: Terminal shows "Connecting..." but never connects
+  Fix:     The browser can't reach the Rust API WebSocket at port 3000.
+           1. Check if Rust API is running:
+               docker ps | grep rust_api  (should show "Up")
+           2. Check if port 3000 is accessible:
+               curl -i http://localhost:3000/api/analytics/dashboard
+           3. If Rust API is stopped or erroring, check logs:
+               docker logs erp_rust_api --tail 50
+           4. If postgres or rabbitmq is unhealthy, restart them:
+               docker compose down -v
+               docker compose up -d
+           5. Once all containers show "Up", browser WebSocket should auto-reconnect
+           6. Check browser console (F12) for any CORS or network errors
+
+  Problem: Rust API container exits immediately or shows "Restarting"
+  Fix:     It likely can't connect to Postgres or RabbitMQ. Steps to debug:
+               # Check Rust API logs
+               docker logs erp_rust_api --tail 100
+               # Verify dependencies are healthy
+               docker compose ps
+               # If postgres shows "unhealthy", apply the fix above
+               # If everything is healthy, rebuild the Rust API:
+               docker compose build --no-cache rust_api
+               docker compose up -d rust_api
 
   Problem: Terminal in /simulate stays empty after clicking a batch
   Fix:     Check python_worker is running:
@@ -138,14 +168,13 @@ PREREQUISITES
            If not listed or shows "Restarting", check logs:
                docker logs erp_python_worker --tail 50
            Common issues:
-             • Worker not started: Use `docker compose --profile etl up -d`
              • RabbitMQ connection failure: Wait 30s, then restart worker:
-                 docker compose --profile etl up -d python_worker
+                 docker compose restart python_worker
              • Database connection issue: Verify postgres is healthy:
                  docker ps | grep postgres  (should show "healthy")
            To debug in detail, rebuild and restart with output:
                docker compose build python_worker
-               docker compose --profile etl up python_worker
+               docker compose up python_worker
 
   Problem: python_worker keeps restarting (status "Restarting (1)")
   Fix:     This means the worker crashes on startup. Run diagnostics:
@@ -164,7 +193,7 @@ PREREQUISITES
   Problem: Worker exits with "ModuleNotFoundError"
   Fix:     The Docker image may have cached stale dependencies. Rebuild:
                docker compose build --no-cache python_worker
-               docker compose --profile etl up -d python_worker
+               docker compose up -d python_worker
 
   Problem: /api/students returns 500 error
   Fix:     The gpa column must be FLOAT8 (not NUMERIC). Apply manually:

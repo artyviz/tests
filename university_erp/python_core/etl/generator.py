@@ -26,7 +26,11 @@ last_names = [
 ]
 
 departments = [
-    "cs-dept-1", "ee-dept-2", "me-dept-3", "ce-dept-4", "mg-dept-5"
+    "d0000001-0000-0000-0000-000000000001",  # CS
+    "d0000002-0000-0000-0000-000000000002",  # Math
+    "d0000003-0000-0000-0000-000000000003",  # Physics
+    "d0000004-0000-0000-0000-000000000004",  # EE
+    "d0000005-0000-0000-0000-000000000005"   # ME
 ]
 
 def generate_students(count: int) -> Iterator[dict]:
@@ -48,7 +52,7 @@ def generate_students(count: int) -> Iterator[dict]:
             "email": email,
             "date_of_birth": "2000-01-01",
             "enrollment_date": now_iso[:10],
-            "department_id": None,
+            "department_id": dept,
             "status": "active",
             "gpa": round(random.uniform(2.0, 4.0), 2),
             "enrolled_course_ids": [],

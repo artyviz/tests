@@ -24,7 +24,7 @@ services:
       - ./database/seed.sql:/docker-entrypoint-initdb.d/02_seed.sql
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U erp_admin -d university_erp" ]
+      test: [ "CMD", "pg_isready", "-U", "erp_admin", "-d", "university_erp" ]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -91,7 +91,6 @@ services:
       dockerfile: Dockerfile
     container_name: erp_python_worker
     restart: unless-stopped
-    profiles: [ "etl" ]
     depends_on:
       postgres:
         condition: service_healthy
