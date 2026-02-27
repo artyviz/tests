@@ -1,0 +1,4 @@
+{
+  "image": "mcr.microsoft.com/devcontainers/universal:2",
+  "features": {"ghcr.io/devcontainers/features/docker-in-docker:2": {"ghcr.io/devcontainers/features/rust:1": {"ghcr.io/itsmechlark/features/postgresql:1": {"ghcr.io/devcontainers/features/python:1": {"ghcr.io/rabdulwahhab/devcontainer-features/erlang-asdf:1": {}}}}}}
+}
