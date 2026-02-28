@@ -243,10 +243,17 @@
     ];
 
     function connectWebSocket() {
+        // GitHub Codespaces does SSL termination at their proxy, 
+        // so we connect using 'wss:' if the page is loaded over HTTPS.
+        // The path must match exactly where FastAPI mounted the websocket.
         const wsProto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-        ws = new WebSocket(`${wsProto}//${window.location.host}/ws/live`);
+        const wsUrl = `${wsProto}//${window.location.host}/ws/live`;
+
+        console.log(`[WS] Attempting to connect to: ${wsUrl}`);
+        ws = new WebSocket(wsUrl);
 
         ws.onopen = () => {
+            console.log('[WS] Connection established');
             socketStatus.textContent = '● LIVE';
             socketStatus.style.color = '#3fb950';
         };
@@ -272,13 +279,15 @@
             }
         };
 
-        ws.onclose = () => {
+        ws.onclose = (event) => {
+            console.log(`[WS] Connection closed (code: ${event.code}, reason: ${event.reason})`);
             socketStatus.textContent = '● DISCONNECTED';
             socketStatus.style.color = '#f85149';
             setTimeout(connectWebSocket, 5000);
         };
 
-        ws.onerror = () => {
+        ws.onerror = (error) => {
+            console.error('[WS] Connection error:', error);
             socketStatus.textContent = '⚠ ERROR';
             socketStatus.style.color = '#f85149';
         };

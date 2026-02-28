@@ -22,6 +22,10 @@ async def api_post(path: str, data: dict):
         r = await client.post(f"{API}{path}", json=data, timeout=10)
         return r.json(), r.status_code
 
+@app.get("/favicon.ico", include_in_schema=False)
+async def favicon():
+    return Response(status_code=204)
+
 @app.get("/", response_class=HTMLResponse)
 async def index():
     return RedirectResponse(url="/simulate", status_code=302)
