@@ -243,11 +243,16 @@
     ];
 
     function connectWebSocket() {
-        // GitHub Codespaces does SSL termination at their proxy, 
-        // so we connect using 'wss:' if the page is loaded over HTTPS.
-        // The path must match exactly where FastAPI mounted the websocket.
         const wsProto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-        const wsUrl = `${wsProto}//${window.location.host}/ws/live`;
+        let wsUrl = `${wsProto}//${window.location.host}/ws/live`;
+
+        // GitHub Codespaces maps ports via subdomain: e.g. <name>-8000.app.github.dev
+        // We want to connect DIRECTLY to the Rust API (port 3000) to bypass 
+        // FastAPI proxy issues with WebSockets in Codespaces.
+        if (window.location.host.includes('.github.dev')) {
+            const host3000 = window.location.host.replace('-8000.', '-3000.');
+            wsUrl = `${wsProto}//${host3000}/api/ws`;
+        }
 
         console.log(`[WS] Attempting to connect to: ${wsUrl}`);
         ws = new WebSocket(wsUrl);
