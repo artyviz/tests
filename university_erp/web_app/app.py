@@ -104,7 +104,8 @@ async def websocket_proxy(ws: WebSocket):
                 pass
             finally:
                 task.cancel()
-    except Exception:
+    except Exception as e:
+        print(f"WebSocket proxy error: {e}")
         try:
             await ws.close()
         except Exception:
