@@ -1,4 +1,5 @@
 use std::net::SocketAddr;
+use std::time::Duration;
 
 use axum::{routing::{get, post}, Router};
 use sqlx::postgres::PgPoolOptions;
@@ -44,9 +45,23 @@ async fn main() {
         .route("/login", post(auth::login))
         .route("/me", get(auth::me));
 
-    let amqp_conn = Connection::connect(&cfg.rabbitmq_url, ConnectionProperties::default())
-        .await
-        .expect("Failed to connect to RabbitMQ");
+    let amqp_conn = {
+        let max_retries = 20;
+        let mut attempt = 0;
+        loop {
+            attempt += 1;
+            match Connection::connect(&cfg.rabbitmq_url, ConnectionProperties::default()).await {
+                Ok(conn) => break conn,
+                Err(e) => {
+                    if attempt >= max_retries {
+                        panic!("Failed to connect to RabbitMQ after {} attempts: {}", max_retries, e);
+                    }
+                    tracing::warn!("RabbitMQ not ready (attempt {}/{}): {} — retrying in 3s", attempt, max_retries, e);
+                    tokio::time::sleep(Duration::from_secs(3)).await;
+                }
+            }
+        }
+    };
 
     tracing::info!("Connected to RabbitMQ");
 
