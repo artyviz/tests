@@ -1,6 +1,4 @@
-# University ERP System
-
-A full-stack University Enterprise Resource Planning system built with **Rust**, **Python**, and **PostgreSQL** — featuring real-time data ingestion simulation, live WebSocket terminal, and a dark-themed analytics dashboard.
+# Real time Database pipeline simulator 
 
 ## Architecture
 
